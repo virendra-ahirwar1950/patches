@@ -2,7 +2,7 @@ name: jQuery UI Accordion
 type: module
 description: 'Provides jQuery UI Accordion library.'
 package: jQuery UI
-core_version_requirement: ^8 || ^9
+core_version_requirement: ^8 || ^9 || ^10
 dependencies:
   - jquery_ui:jquery_ui
 

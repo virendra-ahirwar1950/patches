@@ -1,0 +1,13 @@
+diff --git a/jquery_ui_accordion/jquery_ui_accordion.info.yml b/jquery_ui_accordion/jquery_ui_accordion.info.yml
+index fa5a888..552fd35 100644
+--- a/jquery_ui_accordion/jquery_ui_accordion.info.yml
++++ b/jquery_ui_accordion/jquery_ui_accordion.info.yml
+@@ -2,7 +2,7 @@ name: jQuery UI Accordion
+ type: module
+ description: 'Provides jQuery UI Accordion library.'
+ package: jQuery UI
+-core_version_requirement: ^8 || ^9
++core_version_requirement: ^8 || ^9 || ^10
+ dependencies:
+   - jquery_ui:jquery_ui
+ 
