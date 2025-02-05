@@ -1,0 +1,13 @@
+name: Coherence core
+description: Core functionality for Coherence websites.
+type: module
+core: 8.x
+core_version_requirement: ^8 || ^9
+package: Coherence
+dependencies:
+  - drupal:node
+  - drupal:views
+  - token
+  - request_data_conditions
+  - context
+  - cohesion_elements

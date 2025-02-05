@@ -1,0 +1,37 @@
+<?php
+
+function coherence_core_install() {
+  _coherence_core_disable_content_view();
+}
+
+/**
+ * Disable the /node front page View.
+ */
+function coherence_core_update_8100(&$sandbox) {
+  _coherence_core_disable_content_view();
+}
+
+function _coherence_core_disable_content_view() {
+  $front_page_view = \Drupal::entityTypeManager()->getStorage('view')
+    ->load('frontpage');
+
+  if ($front_page_view) {
+  	$front_page_view->setStatus(FALSE)->save();
+  }
+
+}
+
+/**
+ * Update permissions for the versions route.
+ */
+function coherence_core_update_8101(&$sandbox) {
+  $roles = \Drupal::entityTypeManager()->getStorage('user_role')
+    ->loadMultiple();
+
+  foreach ($roles as $role) {
+    if ($role->hasPermission('access content')) {
+      $role->grantPermission('access coherence versions');
+      $role->save();
+    }
+  }
+}

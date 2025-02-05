@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - coherence_core
+name: timestamp_has_not_past
+label: 'End date has not past'
+group: null
+description: ''
+requireAllConditions: false
+disabled: false
+conditions:
+  node_timestamp_past:
+    id: node_timestamp_past
+    negate: 1
+    uuid: f4a82d88-4f88-4555-b03c-4467f9291580
+    field: field_end_date
+    context_mapping: {  }
+reactions: {  }
+weight: 0

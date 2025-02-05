@@ -1,0 +1,9 @@
+<div class="exposed-filter-links">
+    <h2>{{ label }}</h2>
+    <ul>
+        {% for link in links %}
+            {% set classes = active ? 'active' : '' %}
+        <li class="{{ classes }}">{{ link }}</li>
+        {% endfor %}
+    </ul>
+</div>

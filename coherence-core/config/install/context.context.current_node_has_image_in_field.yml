@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - coherence_core
+name: current_node_has_image_in_field
+label: 'Current node has image in field'
+group: null
+description: ''
+requireAllConditions: false
+disabled: false
+conditions:
+  node_has_image_in_field:
+    id: node_has_image_in_field
+    negate: null
+    uuid: dff5d61a-ad5b-409c-8bef-647eef0eb18d
+    field: field_image
+    context_mapping: {  }
+reactions: {  }
+weight: 0

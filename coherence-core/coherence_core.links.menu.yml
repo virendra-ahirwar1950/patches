@@ -1,0 +1,14 @@
+coherence_core.admin:
+  title: Coherence
+  description: Manage Coherence settings
+  parent: system.admin_config
+  route_name: coherence_core.admin
+  weight: -101
+  menu_name: admin
+
+coherence_core.admin.solr_cache:
+  title: Solr cache
+  description: Manage Solr cache settings
+  parent: coherence_core.admin
+  route_name: coherence_core.solr_cache_settings
+  menu_name: admin

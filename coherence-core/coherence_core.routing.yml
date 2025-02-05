@@ -1,0 +1,25 @@
+coherence_core.versions:
+  path: /coherence/versions
+  defaults:
+    _controller: Drupal\coherence_core\Controller\VersionController::versions
+    _title: Versions
+  requirements:
+    _permission: access coherence versions
+
+coherence_core.admin:
+  path: /admin/config/coherence
+  defaults:
+    _controller: Drupal\system\Controller\SystemController::systemAdminMenuBlockPage
+    _title: Coherence
+  requirements:
+    _permission: access coherence administration pages
+
+coherence_core.solr_cache_settings:
+  path: /admin/config/coherence/solr-cache
+  defaults:
+    _title: Solr cache
+    _form: Drupal\coherence_core\Form\SolrCacheSettings
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: administer coherence solr cache

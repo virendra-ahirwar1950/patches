@@ -1,0 +1,39 @@
+coherence_core_third_party_fields:
+  type: mapping
+  label: 'Third party DX8 entity fields'
+  mapping:
+    comments:
+      type: text
+      label: 'Comments'
+
+cohesion_templates.cohesion_content_templates.*.third_party.coherence_core:
+  type: coherence_core_third_party_fields
+  label: 'Coherence fields'
+
+cohesion_templates.cohesion_master_templates.*.third_party.coherence_core:
+  type: coherence_core_third_party_fields
+  label: 'Coherence fields'
+
+cohesion_templates.cohesion_menu_templates.*.third_party.coherence_core:
+  type: coherence_core_third_party_fields
+  label: 'Coherence fields'
+
+cohesion_templates.cohesion_view_templates.*.third_party.coherence_core:
+  type: coherence_core_third_party_fields
+  label: 'Coherence fields'
+
+cohesion_custom_styles.cohesion_custom_style.*.third_party.coherence_core:
+  type: coherence_core_third_party_fields
+  label: 'Coherence fields'
+
+cohesion_style_helpers.cohesion_style_helper.*.third_party.coherence_core:
+  type: coherence_core_third_party_fields
+  label: 'Coherence fields'
+
+cohesion_base_styles.cohesion_base_styles.*.third_party.coherence_core:
+  type: coherence_core_third_party_fields
+  label: 'Coherence fields'
+
+cohesion_elements.cohesion_helper.*.third_party.coherence_core:
+  type: coherence_core_third_party_fields
+  label: 'Coherence `fields'

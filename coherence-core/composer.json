@@ -1,0 +1,7 @@
+{
+  "name": "coherence/coherence-core",
+  "description": "Coherence core",
+  "type": "drupal-module",
+  "minimum-stability": "dev",
+  "version": "1.19.1"
+}

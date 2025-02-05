@@ -1,0 +1,339 @@
+<?php
+
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Session\AccountInterface;
+
+/**
+ * Implements hook_theme().
+ */
+function coherence_core_theme($existing, $type, $theme, $path) {
+  return [
+    'coherence_core_modal_video' => [
+      'variables' => [
+        'title' => NULL,
+        'type' => NULL,
+        'video_id' => NULL,
+        'screenshot' => NULL,
+        'dx8_markup' => NULL,
+        'dx8_class' => NULL,
+      ],
+    ],
+    'coherence_core_views_option_links' => [
+      'variables' => [
+        'links' => [],
+        'label' => '',
+        'active' => FALSE,
+      ],
+    ],
+    'coherence_core_views_option_links_remove' => [
+      'variables' => [
+        'links' => [],
+      ],
+    ],
+  ];
+}
+
+function coherence_core_preprocess_coherence_core_modal_video(&$variables) {
+  if ($variables['type'] == 'youtube') {
+    $variables['video_url'] = "//www.youtube.com/watch?v=$variables[video_id]";
+  }
+  elseif ($variables['type'] == 'vimeo') {
+    $variables['video_url'] = "//vimeo.com/$variables[video_id]";
+  }
+}
+
+/**
+ * Implements hook_token_info_alter().
+ *
+ * @param $info
+ */
+function coherence_core_token_info_alter(&$info) {
+  // Add date tokens to timestamp fields for all content entity types.
+  foreach (\Drupal::entityTypeManager()
+             ->getDefinitions() as $entity_type_id => $entity_type) {
+    if (!$entity_type->entityClassImplements(ContentEntityInterface::class)) {
+      continue;
+    }
+
+    // Make sure a token type exists for this entity.
+    $token_type = \Drupal::service('token.entity_mapper')
+      ->getTokenTypeForEntityType($entity_type_id);
+    if (empty($token_type)) {
+      continue;
+    }
+
+    $fields = \Drupal::service('entity_field.manager')
+      ->getFieldStorageDefinitions($entity_type_id);
+    foreach ($fields as $field_name => $field) {
+      $field_token_name = "$token_type-$field_name";
+
+      /** @var \Drupal\field\FieldStorageConfigInterface $field */
+      if ($field->getType() == 'timestamp' && isset($info['tokens'][$field_token_name])) {
+        $info['tokens'][$field_token_name]['date'] = $info['tokens'][$field_token_name]['value'];
+        $info['tokens'][$field_token_name]['date']['name'] .= ' ' . t('format');
+        $info['tokens'][$field_token_name]['date']['type'] = 'date';
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_tokens().
+ *
+ * @param $type
+ * @param $tokens
+ * @param array $data
+ * @param array $options
+ * @param \Drupal\Core\Render\BubbleableMetadata $bubbleable_metadata
+ *
+ * @return array
+ */
+function coherence_core_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
+  $replacements = [];
+
+  // Add replacements for timestamp field date tokens.
+  if (!empty($data['field_property'])) {
+    foreach ($tokens as $token => $original) {
+      $delta = 0;
+      $parts = explode(':', $token);
+      if (is_numeric($parts[0])) {
+        if (count($parts) > 1) {
+          $delta = $parts[0];
+          $property_name = $parts[1];
+          // Remove the delta to unify between having and not having one.
+          array_shift($parts);
+        }
+        else {
+          // Token is fieldname:delta, which is invalid.
+          continue;
+        }
+      }
+      else {
+        $property_name = $parts[0];
+      }
+
+      if (isset($data[$data['field_name']][$delta])) {
+        $field_item = $data[$data['field_name']][$delta];
+      }
+      else {
+        // The field has no such delta, abort replacement.
+        continue;
+      }
+
+      if (in_array($field_item->getFieldDefinition()
+          ->getType(), ['timestamp']) && in_array($property_name, ['date'])) {
+        $datetime = $field_item->value;
+
+        if ($property_name == $token) {
+          $replacements[$original] = $datetime;
+        }
+        else {
+          $field_tokens = \Drupal::token()
+            ->findWithPrefix($tokens, $property_name);
+          $replacements += \Drupal::token()
+            ->generate('date', $field_tokens, ['date' => $datetime], $options, $bubbleable_metadata);
+        }
+      }
+    }
+  }
+
+  return $replacements;
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ *
+ * @param $implementations
+ * @param $hook
+ */
+function coherence_core_module_implements_alter(&$implementations, $hook) {
+  // To alter timestamp fields we need to make sure our hooks run after the
+  // ones in the token module.
+  if ($hook == 'token_info_alter' || $hook == 'tokens') {
+    $group = $implementations['coherence_core'];
+    unset($implementations['coherence_core']);
+    $implementations['coherence_core'] = $group;
+  }
+}
+
+function coherence_core_preprocess_bef_links(&$vars) {
+  $route = $vars['element']['#bef_path']->getRouteName();
+  $args = explode('.', $route);
+
+  $svc = \Drupal::service('coherence_core.views_exposed_filter_options');
+
+  if ($svc->isEnabled($args[1], $args[2])) {
+    $urls = $svc->getUrls($vars['links'], $vars['element']['#name']);
+
+    foreach ($urls as $filter_value => $url) {
+      $vars['element'][$filter_value]['#url'] = $url;
+      $vars['element'][$filter_value]['#attributes']['rel'] = 'nofollow';
+    }
+  }
+}
+
+function coherence_core_form_views_exposed_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
+  $svc = \Drupal::service('coherence_core.views_exposed_filter_options');
+  $view = $form_state->get('view');
+  if ($view && $view instanceof \Drupal\views\ViewExecutable && $svc->isEnabled($view->id(), $view->current_display)) {
+    $remove_links = \Drupal::service('coherence_core.views_exposed_filter_options')
+      ->getRemoveLinksFromExposedForm($form);
+
+    if (!empty($remove_links)) {
+      $form['filter_remove_links'] = [
+        '#weight' => -100,
+        '#theme' => 'coherence_core_views_option_links_remove',
+        '#links' => $remove_links,
+      ];
+    }
+
+    $form['filter_heading'] = [
+      '#markup' => '<span class="filter-by-heading">' . t('Filter by') . ':</span>',
+      '#weight' => -99,
+    ];
+  }
+}
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function coherence_core_menu_local_tasks_alter(&$data, $route_name) {
+  // Move delete link to the end of tabs for Marv.
+  if (!empty($data['tabs'][0])) {
+    foreach ($data['tabs'][0] as $key => $item) {
+      if ($item['#link']['title'] == t('Delete')) {
+        $data['tabs'][0][$key]['#weight'] = 10000;
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_page_attachments_alter().
+ */
+function coherence_core_page_attachments_alter(array &$attachments) {
+  foreach ($attachments['#attached']['html_head'] as $key => $attachment) {
+    if ($attachment[1] == 'system_meta_generator') {
+      unset($attachments['#attached']['html_head'][$key]);
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_field().
+ */
+function coherence_core_preprocess_field(&$vars) {
+  // Add .coh-wysiwyg around WYSIWYG fields so base styles can take effect.
+  if ($vars['element']['#formatter'] === 'text_default') {
+    $uses_cohesion = FALSE;
+
+    foreach (\Drupal\Core\Render\Element::children($vars['element']) as $key) {
+      if ($vars['element'][$key]['#format'] === 'cohesion') {
+        $uses_cohesion = TRUE;
+        break;
+      }
+    }
+
+    if ($uses_cohesion) {
+      $vars['attributes']['class'][] = 'coh-wysiwyg';
+    }
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ *
+ * @param $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param $form_id
+ */
+function coherence_core_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Add comments field to Cohesion config entities.
+  $forms = [
+    'cohesion_content_templates_edit_form',
+    'cohesion_master_templates_add_form',
+    'cohesion_master_templates_edit_form',
+    'cohesion_menu_templates_add_form',
+    'cohesion_menu_templates_edit_form',
+    'cohesion_view_templates_add_form',
+    'cohesion_view_templates_edit_form',
+    'cohesion_component_add_form',
+    'cohesion_component_edit_form',
+    'cohesion_custom_style_cohesion_custom_style_add_form',
+    'cohesion_custom_style_cohesion_custom_style_edit_form',
+    'cohesion_style_helper_cohesion_style_helper_add_form',
+    'cohesion_style_helper_cohesion_style_helper_edit_form',
+    'cohesion_base_styles_edit_form',
+    'cohesion_helper_add_form',
+    'cohesion_helper_edit_form',
+  ];
+
+  if (in_array($form_id, $forms)) {
+    $template = $form_state->getFormObject()->getEntity();
+
+    $form['details']['coherence_comments'] = [
+      '#type' => 'textarea',
+      '#title' => t('Coherence comments'),
+      '#default_value' => $template->getThirdPartySetting('coherence_core', 'comments'),
+      '#weight' => 10,
+    ];
+
+    $form['#entity_builders'][] = 'coherence_core_cohesion_form_entity_builder';
+  }
+}
+
+function coherence_core_cohesion_form_entity_builder($entity_type, ConfigEntityInterface $entity, &$form, FormStateInterface $form_state) {
+  if ($form_state->getValue('coherence_comments')) {
+    $entity->setThirdPartySetting('coherence_core', 'comments', $form_state->getValue('coherence_comments'));
+  }
+  else {
+    $entity->unsetThirdPartySetting('coherence_core', 'comments');
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function coherence_core_form_restrict_by_ip_login_settings_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $form['restrict_by_ip_login_range']['#maxlength'] = NULL;
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for Views templates.
+ */
+function coherence_core_preprocess_views_view(&$variables) {
+  /** @var \Drupal\views\Entity\View $view */
+  $view = $variables['view'];
+  $view_id = $view->id();
+
+  $data = \Drupal::config('coherence_core.solr_cache')->get('views');
+  if (isset($data[$view_id])) {
+    $max_age = $data[$view_id] * 60;
+
+    // Set the max-age on this template.
+    $variables['#cache']['max-age'] = $max_age;
+    $view->element['#cache']['max-age'] = $max_age;
+
+    // We can't cache a page with a Solr-based View in it.
+    \Drupal::service('page_cache_kill_switch')->trigger();
+
+    // Instead, we pass the max-age up to a response subscriber to set an
+    // appropriate header manually.
+    \Drupal::service('coherence_core.max_age_request_store')
+      ->setMaxAge($max_age);
+  }
+}
+
+/**
+ * Implements hook_user_login().
+ * 
+ * Redirect all users to content not profile
+ */
+function coherence_core_user_login(AccountInterface $account) {
+  // Redirect all users to admin content on login.
+  // Temporarily disabled as it breaks the request password process.
+  //\Drupal::request()->query->set('destination', '/admin/content');
+}

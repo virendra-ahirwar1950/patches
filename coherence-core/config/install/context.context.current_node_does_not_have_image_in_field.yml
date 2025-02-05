@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - coherence_core
+name: current_node_does_not_have_image_in_field
+label: 'Current node does not have image in field'
+group: null
+description: ''
+requireAllConditions: false
+disabled: false
+conditions:
+  node_has_image_in_field:
+    id: node_has_image_in_field
+    negate: 1
+    uuid: a3151f01-088a-45ce-9584-5edb6089ff3d
+    field: field_image
+    context_mapping: {  }
+reactions: {  }
+weight: 0

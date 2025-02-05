@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - coherence_core
+name: not_equal_dates
+label: 'Start and end dates are not equal'
+group: null
+description: 'Passes if start date and end date are on different days'
+requireAllConditions: false
+disabled: false
+conditions:
+  node_timestamps_equal:
+    id: node_timestamps_equal
+    negate: 1
+    uuid: 870d96e0-d942-4efe-86ae-b413df6028fa
+    field_one: field_start_date
+    field_two: field_end_date
+    context_mapping: {  }
+reactions: {  }
+weight: 0

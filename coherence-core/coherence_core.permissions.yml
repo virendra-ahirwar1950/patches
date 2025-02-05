@@ -1,0 +1,23 @@
+export dx8 configuration:
+  title: Export DX8 configuration
+  description: 'Grant access to export DX8 configuration through the UI'
+  restrict access: TRUE
+
+import dx8 configuration:
+  title: Import DX8 configuration
+  description: 'Grant access to import DX8 configuration through the UI'
+  restrict access: TRUE
+
+administer coherence solr cache:
+  title: Administer Coherence Solr cache
+  description: Administer Coherence Solr cache
+  restrict access: TRUE
+
+access coherence administration pages:
+  title: Access Coherence admin pages
+  description: Access Coherence admin pages
+  restrict access: TRUE
+
+access coherence versions:
+  title: Access Coherence versions
+  description: Access the versions route at /coherence/versions.

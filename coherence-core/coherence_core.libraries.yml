@@ -1,0 +1,11 @@
+lity:
+  css:
+    theme:
+      /libraries/lity/dist/lity.min.css: {}
+  js:
+    /libraries/lity/dist/lity.min.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupalSettings
+    - core/jquery.once
+    - core/drupal

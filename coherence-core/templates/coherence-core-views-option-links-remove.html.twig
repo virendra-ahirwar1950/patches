@@ -1,0 +1,9 @@
+<div class="exposed-filter-links">
+    <span class="current-filters-heading">{{ 'Current filters' | t }}:</span>
+    <ul>
+        {% for link in links %}
+            {% set classes = active ? 'active' : '' %}
+            <li class="{{ classes }}">{{ link }}</li>
+        {% endfor %}
+    </ul>
+</div>

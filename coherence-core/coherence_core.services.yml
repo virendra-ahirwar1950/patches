@@ -1,0 +1,22 @@
+services:
+  coherence_core.views_exposed_filter_options:
+    class: \Drupal\coherence_core\ViewsExposedFilterOptions
+    arguments: ['@request_stack', '@current_route_match', '@module_handler']
+
+  coherence_core.dx8_route_subscriber:
+    class: \Drupal\coherence_core\Routing\DX8RouteSubscriber
+    tags:
+      - { name: event_subscriber }
+
+  remove_x_generator_response_header:
+    class: Drupal\coherence_core\EventSubscriber\RemoveXGeneratorResponseHeader
+    tags:
+      - { name: event_subscriber }
+
+  coherence_core.max_age_request_store:
+    class: Drupal\coherence_core\Solr\CacheMaxAgeRequestStore
+
+  coherence_core.cache_control_subscriber:
+    class: Drupal\coherence_core\EventSubscriber\CacheControlSubscriber
+    tags:
+      - { name: event_subscriber }
