@@ -1,0 +1,5 @@
+<?php
+
+function dx8_subtheme_page_attachments_alter(&$attachments) {
+  $attachments['#attached']['library'][] = 'dx8_subtheme/externalLinks';
+}

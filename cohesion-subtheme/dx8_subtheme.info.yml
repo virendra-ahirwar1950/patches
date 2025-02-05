@@ -1,0 +1,16 @@
+name: DX8 Coherence sub-theme
+type: theme
+core_version_requirement: ^8 || ^9
+base theme: cohesion_theme
+
+libraries:
+  - cohesion_theme/global-styling
+  - dx8_subtheme/global-styling
+
+regions:
+  pre_header: Pre-header
+  header: Header
+  featured: Featured
+  content: Content
+  footer: Footer
+  no_render: Do not render

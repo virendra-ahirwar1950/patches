@@ -1,0 +1,19 @@
+{
+  "name": "cohesion_subtheme",
+  "version": "3.3.4",
+  "description": "A basic SASS Comiler/watcher including sourcemaps",
+  "repository": "n/a",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-register": "^6.23.0",
+    "babel-preset-es2015": "^6.22.0",
+    "gulp": "^3.9.1",
+    "gulp-browserify": "^0.5.1",
+    "gulp-clean-css": "^3.0.2",
+    "gulp-livereload": "^3.8.1",
+    "gulp-notify": "^3.0.0",
+    "gulp-rename": "1.2.2",
+    "gulp-sass": "2.3.2",
+    "gulp-sourcemaps": "2.1.1"
+  }
+}

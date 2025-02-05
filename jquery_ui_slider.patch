@@ -1,0 +1,13 @@
+diff --git a/jquery_ui_slider/jquery_ui_slider.info.yml b/jquery_ui_slider/jquery_ui_slider.info.yml
+index 56c7bc4..3a39e3a 100644
+--- a/jquery_ui_slider/jquery_ui_slider.info.yml
++++ b/jquery_ui_slider/jquery_ui_slider.info.yml
+@@ -2,7 +2,7 @@ name: jQuery UI Slider
+ type: module
+ description: 'Provides jQuery UI Slider library.'
+ package: jQuery UI
+-core_version_requirement: ^8 || ^9
++core_version_requirement: ^8 || ^9 || ^10
+ dependencies:
+   - jquery_ui:jquery_ui
+ 
