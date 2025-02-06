@@ -1,0 +1,13 @@
+diff --git a/cohesion-theme/cohesion_theme.info.yml b/cohesion-theme/cohesion_theme.info.yml
+index 7517810..6dc38a4 100644
+--- a/cohesion-theme/cohesion_theme.info.yml
++++ b/cohesion-theme/cohesion_theme.info.yml
+@@ -1,7 +1,7 @@
+ name: Site Studio minimal
+ type: theme
+ description: A minimal theme as a basis for Site Studio powered websites. It includes some basic styling for Drupal admin functions.
+-core_version_requirement: ^8.8.0 || ^9
++core_version_requirement: ^8.8.0 || ^9 || ^10 || ^11
+ 
+ # Defines the base theme.
+ base theme: stable
