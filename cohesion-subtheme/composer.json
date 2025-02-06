@@ -1,0 +1,7 @@
+{
+  "name": "coherence/cohesion-subtheme",
+  "description": "DX8 sub-theme",
+  "type": "drupal-theme",
+  "minimum-stability": "dev",
+  "version": "2.0.1"
+}

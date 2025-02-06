@@ -1,0 +1,12 @@
+diff --git a/cohesion-subtheme/dx8_subtheme.info.yml b/cohesion-subtheme/dx8_subtheme.info.yml
+index e9b533b..e6546c1 100644
+--- a/cohesion-subtheme/dx8_subtheme.info.yml
++++ b/cohesion-subtheme/dx8_subtheme.info.yml
+@@ -1,6 +1,6 @@
+ name: DX8 Coherence sub-theme
+ type: theme
+-core_version_requirement: ^8 || ^9
++core_version_requirement: ^8 || ^9 || ^10
+ base theme: cohesion_theme
+ 
+ libraries:
