@@ -4,7 +4,6 @@ winnow:
     js/jquery.winnow.js: {}
   dependencies:
     - core/jquery
-    - core/jquery.ui.autocomplete
 filter:
   version: VERSION
   js:

@@ -12,7 +12,8 @@ use Drupal\Core\Routing\RouteMatchInterface;
 /**
  * Implements hook_help().
  */
-function module_filter_help($route_name, RouteMatchInterface $route_match) {
+function module_filter_help($route_name, RouteMatchInterface $route_match)
+{
   switch ($route_name) {
     case 'help.page.module_filter':
       $output = '';
@@ -32,7 +33,8 @@ function module_filter_help($route_name, RouteMatchInterface $route_match) {
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function module_filter_form_system_modules_alter(&$form, FormStateInterface $form_state, $form_id) {
+function module_filter_form_system_modules_alter(&$form, FormStateInterface $form_state, $form_id)
+{
   $request_object = \Drupal::request();
   $config = \Drupal::config('module_filter.settings');
 
@@ -111,7 +113,8 @@ function module_filter_form_system_modules_alter(&$form, FormStateInterface $for
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function module_filter_form_system_modules_confirm_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+function module_filter_form_system_modules_confirm_form_alter(&$form, FormStateInterface $form_state, $form_id)
+{
   $request_object = \Drupal::request();
   $form['filters']['text'] = [
     '#type' => 'value',
@@ -123,7 +126,8 @@ function module_filter_form_system_modules_confirm_form_alter(&$form, FormStateI
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function module_filter_form_system_modules_uninstall_alter(&$form, FormStateInterface $form_state, $form_id) {
+function module_filter_form_system_modules_uninstall_alter(&$form, FormStateInterface $form_state, $form_id)
+{
   $request_object = \Drupal::request();
   $key = array_search('system/drupal.system.modules', $form['#attached']['library']);
   if ($key !== FALSE) {
@@ -140,7 +144,8 @@ function module_filter_form_system_modules_uninstall_alter(&$form, FormStateInte
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function module_filter_form_user_admin_permissions_alter(&$form, FormStateInterface $form_state, $form_id) {
+function module_filter_form_user_admin_permissions_alter(&$form, FormStateInterface $form_state, $form_id)
+{
   $request_object = \Drupal::request();
   $form['filters'] = [
     '#type' => 'container',
@@ -170,16 +175,18 @@ function module_filter_form_user_admin_permissions_alter(&$form, FormStateInterf
 /**
  * Implements hook_theme_registry_alter().
  */
-function module_filter_theme_registry_alter(&$theme_registry) {
+function module_filter_theme_registry_alter(&$theme_registry)
+{
   // We need to alter the system-modules-details template so we can add
   // applicable requires and required-by classes.
-  $theme_registry['system_modules_details']['path'] = drupal_get_path('module', 'module_filter') . '/templates';
+  $theme_registry['system_modules_details']['path'] = \Drupal::service('extension.list.module')->getPath('module_filter') . '/templates';
 }
 
 /**
  * Implements hook_preprocess_HOOK().
  */
-function module_filter_preprocess_system_modules_details(&$variables) {
+function module_filter_preprocess_system_modules_details(&$variables)
+{
   $display_path = \Drupal::config('module_filter.settings')->get('path');
   if ($display_path) {
     foreach ($variables['modules'] as &$module) {
@@ -187,7 +194,7 @@ function module_filter_preprocess_system_modules_details(&$variables) {
       // Because core does not provide it in
       // template_preprocess_system_modules_details.
       $id = $module['name']['#parents'][1];
-      $path = drupal_get_path('module', $id);
+      $path = \Drupal::service('extension.list.module')->getPath($id);
       if (!empty($path)) {
         $module['path'] = $path;
       }
@@ -198,7 +205,8 @@ function module_filter_preprocess_system_modules_details(&$variables) {
 /**
  * Form submit callback to track recently enabled modules.
  */
-function module_filter_system_modules_recent_enabled_submit($form, FormStateInterface $form_state) {
+function module_filter_system_modules_recent_enabled_submit($form, FormStateInterface $form_state)
+{
   $state = \Drupal::state();
   $recent = $state->get('module_filter.recent') ?: [];
 
@@ -210,8 +218,7 @@ function module_filter_system_modules_recent_enabled_submit($form, FormStateInte
     foreach ($form_state->getValue('modules') as $package) {
       $modules += $package;
     }
-  }
-  else {
+  } else {
     $modules = $form_state->getValue('modules');
   }
 
@@ -229,7 +236,8 @@ function module_filter_system_modules_recent_enabled_submit($form, FormStateInte
 /**
  * Form submit callback for remembering the filter value.
  */
-function module_filter_system_modules_redirect_submit($form, FormStateInterface $form_state) {
+function module_filter_system_modules_redirect_submit($form, FormStateInterface $form_state)
+{
   if ($text = $form_state->getValue('text')) {
     /** @var \Drupal\Core\Url $route_name */
     $route_name = ($redirect = $form_state->getRedirect()) ? $redirect->getRouteName() : 'system.modules_list';
