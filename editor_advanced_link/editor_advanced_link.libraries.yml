@@ -5,4 +5,4 @@ editor_advanced_link:
   dependencies:
     - core/drupal
     - core/jquery
-    - core/jquery.once
+    - core/once
