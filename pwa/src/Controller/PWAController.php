@@ -254,7 +254,7 @@ class PWAController implements ContainerInjectionInterface {
    * @return mixed
    */
   public function pwa_serviceworker_file_data(Request $request) {
-    $path = drupal_get_path('module', 'pwa');
+    $path = \Drupal::service('extension.list.module')->getPath('pwa');
 
     $sw = file_get_contents($path . '/js/serviceworker.js');
 
