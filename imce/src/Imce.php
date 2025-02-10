@@ -7,6 +7,7 @@ use Drupal\user\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\File\FileUrlGeneratorInterface;
 
 /**
  * Imce container class for helper methods.
@@ -102,10 +103,10 @@ class Imce {
     // Set root uri and url.
     $conf['root_uri'] = $conf['scheme'] . '://';
     // file_create_url requires a filepath for some schemes like private:// .
-    $conf['root_url'] = preg_replace('@/(?:%2E|\.)$@i', '', file_create_url($conf['root_uri'] . '.'));
+    $conf['root_url'] = preg_replace('@/(?:%2E|\.)$@i', '', \Drupal::service('file_url_generator')->generateAbsoluteString("public://imce") . '/');
     // Convert to relative.
     if (!\Drupal::config('imce.settings')->get('abs_urls')) {
-      $conf['root_url'] = file_url_transform_relative($conf['root_url']);
+      $conf['root_url'] = \Drupal::service('file_url_generator')->transformRelative($conf['root_url']);
     }
     $conf['token'] = $user->isAnonymous() ? 'anon' : \Drupal::csrfToken()->get('imce');
     // Process folders.

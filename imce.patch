@@ -1,0 +1,93 @@
+diff --git a/imce/imce.info.yml b/imce/imce.info.yml
+index 19db8ac..ab9a5e1 100644
+--- a/imce/imce.info.yml
++++ b/imce/imce.info.yml
+@@ -2,7 +2,7 @@ name: Imce File Manager
+ type: module
+ description: Provides a file manager supporting personal folders.
+ package: Media
+-core_version_requirement: ^8.8 || ^9
++core_version_requirement: ^8.8 || ^9 || ^10 || ^11
+ configure: imce.admin
+ dependencies:
+   - 'drupal:system (>= 8.8)'
+diff --git a/imce/src/Imce.php b/imce/src/Imce.php
+index e99d1f0..4843c68 100644
+--- a/imce/src/Imce.php
++++ b/imce/src/Imce.php
+@@ -7,6 +7,7 @@ use Drupal\user\Entity\User;
+ use Symfony\Component\HttpFoundation\Request;
+ use Drupal\Core\Session\AccountProxyInterface;
+ use Drupal\Core\Render\BubbleableMetadata;
++use Drupal\Core\File\FileUrlGeneratorInterface;
+ 
+ /**
+  * Imce container class for helper methods.
+@@ -102,10 +103,10 @@ class Imce {
+     // Set root uri and url.
+     $conf['root_uri'] = $conf['scheme'] . '://';
+     // file_create_url requires a filepath for some schemes like private:// .
+-    $conf['root_url'] = preg_replace('@/(?:%2E|\.)$@i', '', file_create_url($conf['root_uri'] . '.'));
++    $conf['root_url'] = preg_replace('@/(?:%2E|\.)$@i', '', \Drupal::service('file_url_generator')->generateAbsoluteString("public://imce") . '/');
+     // Convert to relative.
+     if (!\Drupal::config('imce.settings')->get('abs_urls')) {
+-      $conf['root_url'] = file_url_transform_relative($conf['root_url']);
++      $conf['root_url'] = \Drupal::service('file_url_generator')->transformRelative($conf['root_url']);
+     }
+     $conf['token'] = $user->isAnonymous() ? 'anon' : \Drupal::csrfToken()->get('imce');
+     // Process folders.
+diff --git a/imce/src/Plugin/CKEditorPlugin/Imce.php b/imce/src/Plugin/CKEditorPlugin/Imce.php
+index a327687..e02d7b7 100644
+--- a/imce/src/Plugin/CKEditorPlugin/Imce.php
++++ b/imce/src/Plugin/CKEditorPlugin/Imce.php
+@@ -27,7 +27,7 @@ class Imce extends CKEditorPluginBase {
+    * {@inheritdoc}
+    */
+   public function getFile() {
+-    return drupal_get_path('module', 'imce') . '/js/plugins/ckeditor/imce.ckeditor.js';
++    return \Drupal::service('extension.list.module')->getPath('imce') . '/js/plugins/ckeditor/imce.ckeditor.js';
+   }
+ 
+   /**
+@@ -51,8 +51,8 @@ class Imce extends CKEditorPluginBase {
+    */
+   public function getConfig(Editor $editor) {
+     return [
+-      'ImceImageIcon' => file_create_url($this->imageIcon()),
+-      'ImceLinkIcon' => file_create_url($this->linkIcon()),
++      'ImceImageIcon' => \Drupal::service('file_url_generator')->generateAbsoluteString($this->imageIcon()),
++      'ImceLinkIcon' => \Drupal::service('file_url_generator')->generateAbsoluteString($this->linkIcon()),
+     ];
+   }
+ 
+@@ -62,7 +62,7 @@ class Imce extends CKEditorPluginBase {
+    * Uses the icon from drupalimage plugin.
+    */
+   public function imageIcon() {
+-    return drupal_get_path('module', 'imce') . '/js/plugins/ckeditor/icons/imceimage.png';
++    return \Drupal::service('extension.list.module')->getPath('imce') . '/js/plugins/ckeditor/icons/imceimage.png';
+   }
+ 
+   /**
+@@ -71,7 +71,7 @@ class Imce extends CKEditorPluginBase {
+    * Uses the icon from drupallink plugin.
+    */
+   public function linkIcon() {
+-    return drupal_get_path('module', 'imce') . '/js/plugins/ckeditor/icons/imcelink.png';
++    return \Drupal::service('extension.list.module')->getPath('imce') . '/js/plugins/ckeditor/icons/imcelink.png';
+   }
+ 
+ }
+diff --git a/imce/tests/src/Kernel/Plugin/KernelTestBasePlugin.php b/imce/tests/src/Kernel/Plugin/KernelTestBasePlugin.php
+index 30e5690..439d794 100644
+--- a/imce/tests/src/Kernel/Plugin/KernelTestBasePlugin.php
++++ b/imce/tests/src/Kernel/Plugin/KernelTestBasePlugin.php
+@@ -132,7 +132,7 @@ abstract class KernelTestBasePlugin extends KernelTestBase {
+    *   uri.
+    */
+   protected function getTestFileUri() {
+-    \Drupal::service('file_system')->copy(drupal_get_path('module', 'imce') . '/tests/files/ciandt.jpg', PublicStream::basePath());
++    \Drupal::service('file_system')->copy(\Drupal::service('extension.list.module')->getPath('imce') . '/tests/files/ciandt.jpg', PublicStream::basePath());
+     return 'public://ciandt.jpg';
+   }
+ 
