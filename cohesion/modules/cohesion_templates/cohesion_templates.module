@@ -270,6 +270,7 @@ function _cohesion_templates_get_template_candidate(ContentEntityInterface $enti
     ->sort('default', 'DESC')
   // We only need to find the first template, as we know they all exist.
     ->sort('bundle', 'DESC')
+    ->accessCheck(FALSE)
     ->execute();
 
   return [
@@ -449,6 +450,7 @@ function _cohesion_templates_get_master_template() {
     $candidate_template_ids = \Drupal::service('entity_type.manager')->getStorage('cohesion_master_templates')->getQuery()
       ->condition('default', TRUE)
       ->condition('status', TRUE)
+      ->accessCheck(FALSE)
       ->execute();
 
     if (count($candidate_template_ids) > 0) {

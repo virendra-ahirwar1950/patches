@@ -144,6 +144,7 @@ class PackageFormRefreshController extends ControllerBase {
       $ids = $this->entityTypeManager->getStorage($type)
         ->getQuery()
         ->condition($entity_type->getKey('uuid'), $uuids, 'IN')
+        ->accessCheck(FALSE)
         ->execute();
 
       $entities = $this->entityTypeManager->getStorage($type)

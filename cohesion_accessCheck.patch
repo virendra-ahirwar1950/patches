@@ -1,0 +1,588 @@
+diff --git a/cohesion/modules/cohesion_custom_styles/cohesion_custom_styles.install b/cohesion/modules/cohesion_custom_styles/cohesion_custom_styles.install
+index d45b231..4195302 100644
+--- a/cohesion/modules/cohesion_custom_styles/cohesion_custom_styles.install
++++ b/cohesion/modules/cohesion_custom_styles/cohesion_custom_styles.install
+@@ -56,6 +56,7 @@ function cohesion_custom_styles_update_8402(&$variables) {
+           ->condition('parent', $parent->getClass(), '=')
+           ->sort('label', 'ASC')
+           ->sort('weight', 'ASC')
++          ->accessCheck(FALSE)
+           ->execute();
+ 
+         if($children_styles){
+diff --git a/cohesion/modules/cohesion_custom_styles/src/Controller/CustomStylesEndpointController.php b/cohesion/modules/cohesion_custom_styles/src/Controller/CustomStylesEndpointController.php
+index 30bd213..7e4af08 100644
+--- a/cohesion/modules/cohesion_custom_styles/src/Controller/CustomStylesEndpointController.php
++++ b/cohesion/modules/cohesion_custom_styles/src/Controller/CustomStylesEndpointController.php
+@@ -137,7 +137,7 @@ class CustomStylesEndpointController extends ControllerBase {
+       // Get only enabled custom styles
+       // And custom styles with enable selection turned off so we can catch
+       // selectable children but keep the order (parent/children)
+-      $entity_ids = $query->condition('status', TRUE)->execute();
++      $entity_ids = $query->accessCheck(FALSE)->condition('status', TRUE)->execute();
+ 
+       // Execute the query.
+       if (($entities = $storage->loadMultiple($entity_ids))) {
+@@ -152,7 +152,7 @@ class CustomStylesEndpointController extends ControllerBase {
+           }
+ 
+           // Build the children.
+-          $child_ids = $storage->getQuery()->condition('parent', $entity->getClass())->condition('status', TRUE)->condition('selectable', TRUE)->sort('weight')->execute();
++          $child_ids = $storage->acessCheck(FALSE)->getQuery()->condition('parent', $entity->getClass())->condition('status', TRUE)->condition('selectable', TRUE)->sort('weight')->execute();
+ 
+           $child_objects = [];
+           if (count($child_ids) > 0) {
+diff --git a/cohesion/modules/cohesion_custom_styles/src/Entity/CustomStyle.php b/cohesion/modules/cohesion_custom_styles/src/Entity/CustomStyle.php
+index b9a1566..088689a 100644
+--- a/cohesion/modules/cohesion_custom_styles/src/Entity/CustomStyle.php
++++ b/cohesion/modules/cohesion_custom_styles/src/Entity/CustomStyle.php
+@@ -165,7 +165,7 @@ class CustomStyle extends CohesionConfigEntityBase implements CohesionSettingsIn
+       return FALSE;
+     }
+ 
+-    if ($ids = $storage->getQuery()->condition('class_name', $this->getParent())->execute()) {
++    if ($ids = $storage->accessCheck(FALSE)->getQuery()->condition('class_name', $this->getParent())->execute()) {
+ 
+       return reset($ids);
+ 
+@@ -202,7 +202,7 @@ class CustomStyle extends CohesionConfigEntityBase implements CohesionSettingsIn
+ 
+     // If this is a parent item, attempt to get the child entities.
+     if (!$this->getParent()) {
+-      $ids = $storage->getQuery()->condition('parent', $this->getClass())->execute();
++      $ids = $storage->accessCheck(FALSE)->getQuery()->condition('parent', $this->getClass())->execute();
+       $entities = $storage->loadMultiple($ids);
+     }
+ 
+@@ -428,7 +428,7 @@ class CustomStyle extends CohesionConfigEntityBase implements CohesionSettingsIn
+     $entity_type_manager = \Drupal::entityTypeManager();
+     $storage = $entity_type_manager->getStorage($entity_type_repository->getEntityTypeFromClass(get_called_class()));
+ 
+-    $parent_ids = $storage->getQuery()->notExists('parent')
++    $parent_ids = $storage->accessCheck(FALSE)->getQuery()->notExists('parent')
+       ->sort('label', 'ASC')
+       ->sort('weight', 'ASC')
+       ->execute();
+@@ -439,7 +439,7 @@ class CustomStyle extends CohesionConfigEntityBase implements CohesionSettingsIn
+ 
+         /** @var CustomStyle $parent */
+         if ($parent = self::load($entityId)) {
+-          $children = $storage->getQuery()
++          $children = $storage->accessCheck(FALSE)->getQuery()
+             ->condition('parent', $parent->getClass(), '=')
+             ->sort('label', 'ASC')
+             ->sort('weight', 'ASC')
+diff --git a/cohesion/modules/cohesion_custom_styles/src/Form/CustomStylesForm.php b/cohesion/modules/cohesion_custom_styles/src/Form/CustomStylesForm.php
+index 8588493..b4e207a 100644
+--- a/cohesion/modules/cohesion_custom_styles/src/Form/CustomStylesForm.php
++++ b/cohesion/modules/cohesion_custom_styles/src/Form/CustomStylesForm.php
+@@ -212,7 +212,7 @@ class CustomStylesForm extends CohesionStyleBuilderForm {
+     if ($form_state->getValue('original_class_name') !== $this->entity->getClass()) {
+ 
+       $storage = $this->entityTypeManager->getStorage('cohesion_custom_style');
+-      $ids = $storage->getQuery()->condition('parent', $form_state->getValue('original_class_name') ?? '')->execute();
++      $ids = $storage->accessCheck(FALSE)->getQuery()->condition('parent', $form_state->getValue('original_class_name') ?? '')->execute();
+ 
+       // Loop over the children.
+       foreach ($storage->loadMultiple($ids) as $child_entity) {
+@@ -273,7 +273,7 @@ class CustomStylesForm extends CohesionStyleBuilderForm {
+ 
+     $query = $this->entityTypeManager->getStorage('cohesion_custom_style')->getQuery();
+     $query->condition('class_name', custom_style_class_prefix . $value);
+-    $entity_ids = $query->execute();
++    $entity_ids = $query->accessCheck(FALSE)->execute();
+ 
+     return count($entity_ids) > 0;
+   }
+diff --git a/cohesion/modules/cohesion_custom_styles/src/Plugin/Usage/CustomStylesUsage.php b/cohesion/modules/cohesion_custom_styles/src/Plugin/Usage/CustomStylesUsage.php
+index 7a93464..ebea01a 100644
+--- a/cohesion/modules/cohesion_custom_styles/src/Plugin/Usage/CustomStylesUsage.php
++++ b/cohesion/modules/cohesion_custom_styles/src/Plugin/Usage/CustomStylesUsage.php
+@@ -99,7 +99,7 @@ class CustomStylesUsage extends UsagePluginBase {
+       $custom_style_classes = array_unique($custom_style_classes);
+ 
+       // Add them to the dependencies.
+-      $ids = $this->storage->getQuery('IN')
++      $ids = $this->storage->accessCheck(FALSE)->getQuery('IN')
+         ->condition('class_name', $custom_style_classes)
+         ->execute();
+ 
+diff --git a/cohesion/modules/cohesion_custom_styles/src/Plugin/rest/resource/CustomStylesResource.php b/cohesion/modules/cohesion_custom_styles/src/Plugin/rest/resource/CustomStylesResource.php
+index 713cbd6..bc20b2b 100644
+--- a/cohesion/modules/cohesion_custom_styles/src/Plugin/rest/resource/CustomStylesResource.php
++++ b/cohesion/modules/cohesion_custom_styles/src/Plugin/rest/resource/CustomStylesResource.php
+@@ -82,7 +82,7 @@ class CustomStylesResource extends CohesionResourceBase {
+ 
+     // Get parent custom styles.
+     $condition_value = [$custom_style_type->get('id'), 'generic'];
+-    $entity_ids = $storage->getQuery()->sort('weight')->notExists('parent')
++    $entity_ids = $storage->accessCheck(FALSE)->getQuery()->sort('weight')->notExists('parent')
+       ->condition('custom_style_type', $condition_value, 'IN')->condition('status', TRUE)->execute();
+ 
+     // Execute the query.
+@@ -96,7 +96,7 @@ class CustomStylesResource extends CohesionResourceBase {
+ 
+         // Add custom style children entities.
+         $children = [];
+-        $children_ids = $storage->getQuery()->condition('parent', $entity->getClass())->condition('status', TRUE)->condition('selectable', TRUE)->sort('weight')->execute();
++        $children_ids = $storage->accessCheck(FALSE)->getQuery()->condition('parent', $entity->getClass())->condition('status', TRUE)->condition('selectable', TRUE)->sort('weight')->execute();
+         if ($children_ids && count($children_ids) > 0) {
+           foreach ($storage->loadMultiple($children_ids) as $child_entity) {
+             /** @var \Drupal\cohesion_custom_styles\Entity\CustomStyle $child_entity */
+diff --git a/cohesion/modules/cohesion_elements/cohesion_elements.install b/cohesion/modules/cohesion_elements/cohesion_elements.install
+index 21da888..7b1c7bb 100644
+--- a/cohesion/modules/cohesion_elements/cohesion_elements.install
++++ b/cohesion/modules/cohesion_elements/cohesion_elements.install
+@@ -496,7 +496,7 @@ function cohesion_elements_update_8604(){
+ 
+   foreach ($entity_types as $entity_type){
+     $component_ids = \Drupal::entityTypeManager()->getStorage($entity_type)->getQuery()
+-      ->sort('label', 'asc')->execute();
++      ->sort('label', 'asc')->accessCheck(FALSE)->execute();
+     $components = \Drupal\cohesion_elements\Entity\Component::loadMultiple($component_ids);
+     $weight = 0;
+     foreach ($components as $component){
+@@ -606,7 +606,7 @@ function cohesion_elements_update_8903() {
+       ->condition('component', NULL , 'IS NULL');
+ 
+     $component_content_ids = \Drupal::entityTypeManager()->getStorage('component_content')->getQuery()
+-      ->condition($query_condition)->execute();
++      ->condition($query_condition)->accessCheck(FALSE)->execute();
+ 
+     // If we have any ids then load and update the component field to have the component id.
+     if ($component_content_ids) {
+diff --git a/cohesion/modules/cohesion_elements/src/CategoryRelationshipsManager.php b/cohesion/modules/cohesion_elements/src/CategoryRelationshipsManager.php
+index adc8a18..ec81755 100644
+--- a/cohesion/modules/cohesion_elements/src/CategoryRelationshipsManager.php
++++ b/cohesion/modules/cohesion_elements/src/CategoryRelationshipsManager.php
+@@ -54,7 +54,7 @@ class CategoryRelationshipsManager {
+       // Is this category in use anywhere?
+       $query = $element_storage->getQuery()->condition('category', $category_id, '=');
+ 
+-      if ($entity_ids = $query->execute()) {
++      if ($entity_ids = $query->accessCheck(FALSE)->execute()) {
+ 
+         $this->createUncategorized($category_storage, $default_category_id);
+ 
+diff --git a/cohesion/modules/cohesion_elements/src/ComponentListBuilder.php b/cohesion/modules/cohesion_elements/src/ComponentListBuilder.php
+index 9545135..0a89f0c 100644
+--- a/cohesion/modules/cohesion_elements/src/ComponentListBuilder.php
++++ b/cohesion/modules/cohesion_elements/src/ComponentListBuilder.php
+@@ -74,11 +74,11 @@ class ComponentListBuilder extends ElementsListBuilder {
+ 
+     $categories_query = $this->entityTypeManager->getStorage($category_type_id)->getQuery()->sort('weight', 'asc');
+ 
+-    if ($categories = $this->entityTypeManager->getStorage($category_type_id)->loadMultiple($categories_query->execute())) {
++    if ($categories = $this->entityTypeManager->accessCheck(FALSE)->getStorage($category_type_id)->loadMultiple($categories_query->execute())) {
+       foreach ($categories as $category) {
+ 
+         $query = $this->entityTypeManager->getStorage($this->entityType->id())->getQuery()->condition('category', $category->id())->sort('weight', 'asc');
+-        $entities = $this->entityTypeManager->getStorage($this->entityType->id())->loadMultiple($query->execute());
++        $entities = $this->entityTypeManager->accessCheck(FALSE)->getStorage($this->entityType->id())->loadMultiple($query->execute());
+ 
+         // Add custom components.
+         if ($custom_components = $this->customComponentsService->getComponentsInCategory(ComponentCategory::load($category->id()))) {
+@@ -86,7 +86,7 @@ class ComponentListBuilder extends ElementsListBuilder {
+         }
+ 
+         // Count UI & Custom components.
+-        $count = $query->count()->execute() + count($custom_components);
++        $count = $query->count()->accessCheck(FALSE)->execute() + count($custom_components);
+ 
+         // Build the accordions.
+         $form[$this->entityType->id()][$category->id()]['accordion'] = [
+diff --git a/cohesion/modules/cohesion_elements/src/Controller/ComponentContentController.php b/cohesion/modules/cohesion_elements/src/Controller/ComponentContentController.php
+index 3915bb3..26de787 100644
+--- a/cohesion/modules/cohesion_elements/src/Controller/ComponentContentController.php
++++ b/cohesion/modules/cohesion_elements/src/Controller/ComponentContentController.php
+@@ -103,7 +103,7 @@ class ComponentContentController extends ControllerBase {
+       }
+     }
+ 
+-    $ids = $query->execute();
++    $ids = $query->accessCheck(FALSE)->execute();
+     /** @var \Drupal\cohesion_elements\Entity\ComponentContent[ $component_contents */
+     $component_contents = $storage->loadMultiple($ids);
+     $data = [];
+@@ -354,12 +354,12 @@ class ComponentContentController extends ControllerBase {
+ 
+     $categories_query = $this->entityTypeManager->getStorage($category_type_id)->getQuery()->sort('weight', 'asc');
+ 
+-    if ($categories = $this->entityTypeManager->getStorage($category_type_id)->loadMultiple($categories_query->execute())) {
++    if ($categories = $this->entityTypeManager->accessCheck(FALSE)->getStorage($category_type_id)->loadMultiple($categories_query->execute())) {
+       foreach ($categories as $category) {
+ 
+         $query = $this->entityTypeManager->getStorage($entityType->id())->getQuery()->condition('category', $category->id())->sort('weight', 'asc');
+ 
+-        $entities = $this->entityTypeManager->getStorage($entityType->id())->loadMultiple($query->execute());
++        $entities = $this->entityTypeManager->accessCheck(FALSE)->getStorage($entityType->id())->loadMultiple($query->execute());
+ 
+         // Format the custom components as components.
+         if ($custom_components = $this->customComponentsService->getComponentsInCategory(ComponentCategory::load($category->id()))) {
+@@ -368,7 +368,7 @@ class ComponentContentController extends ControllerBase {
+         }
+ 
+         // Count UI & Custom components.
+-        $count = $query->count()->execute() + count($custom_components);
++        $count = $query->accessCheck(FALSE)->count()->execute() + count($custom_components);
+ 
+         // Build the accordions.
+         $build[$entityType->id()][$category->id()]['accordion'] = [
+diff --git a/cohesion/modules/cohesion_elements/src/Controller/ElementsController.php b/cohesion/modules/cohesion_elements/src/Controller/ElementsController.php
+index 4f8e589..ec67979 100644
+--- a/cohesion/modules/cohesion_elements/src/Controller/ElementsController.php
++++ b/cohesion/modules/cohesion_elements/src/Controller/ElementsController.php
+@@ -33,7 +33,7 @@ class ElementsController {
+       return [];
+     }
+ 
+-    $category_entities = $storage->getQuery()->sort('weight')->execute();
++    $category_entities = $storage->accessCheck(FALSE)->getQuery()->sort('weight')->execute();
+     $categories = [];
+ 
+     if ($category_entities = $storage->loadMultiple($category_entities)) {
+@@ -65,7 +65,7 @@ class ElementsController {
+     // Get list of entities matching the specified type.
+     $storage = \Drupal::entityTypeManager()->getStorage($entity_type);
+     $query = $storage->getQuery()->condition('id', $element_id, '=')->range(0, 1);
+-    $ids = $query->execute();
++    $ids = $query->accessCheck(FALSE)->execute();
+     $entities = $storage->loadMultiple($ids);
+     foreach ($entities as $id => $entity) {
+ 
+diff --git a/cohesion/modules/cohesion_elements/src/ElementsListBuilder.php b/cohesion/modules/cohesion_elements/src/ElementsListBuilder.php
+index 4fbfbf8..bb00266 100644
+--- a/cohesion/modules/cohesion_elements/src/ElementsListBuilder.php
++++ b/cohesion/modules/cohesion_elements/src/ElementsListBuilder.php
+@@ -117,18 +117,18 @@ class ElementsListBuilder extends CohesionListBuilder implements FormInterface {
+ 
+     $categories_query = $this->entityTypeManager->getStorage($category_type_id)->getQuery()->sort('weight', 'asc');
+ 
+-    if ($categories = $this->entityTypeManager->getStorage($category_type_id)->loadMultiple($categories_query->execute())) {
++    if ($categories = $this->entityTypeManager->accessCheck(FALSE)->getStorage($category_type_id)->loadMultiple($categories_query->execute())) {
+       foreach ($categories as $category) {
+ 
+         $query = $this->entityTypeManager->getStorage($this->entityType->id())->getQuery()->condition('category', $category->id())->sort('weight', 'asc');
+ 
+-        $entities = $this->entityTypeManager->getStorage($this->entityType->id())->loadMultiple($query->execute());
++        $entities = $this->entityTypeManager->accessCheck(FALSE)->getStorage($this->entityType->id())->loadMultiple($query->execute());
+ 
+         // Build the accordions.
+         $form[$this->entityType->id()][$category->id()]['accordion'] = [
+           '#type' => 'details',
+           '#open' => FALSE,
+-          '#title' => $category->label() . ' (' . $query->count()->execute() . ')',
++          '#title' => $category->label() . ' (' . $query->count()->accessCheck(FALSE)->execute() . ')',
+         ];
+ 
+         // Build the accordion group tables.
+diff --git a/cohesion/modules/cohesion_elements/src/Entity/Component.php b/cohesion/modules/cohesion_elements/src/Entity/Component.php
+index 7f0c547..f2e2c15 100644
+--- a/cohesion/modules/cohesion_elements/src/Entity/Component.php
++++ b/cohesion/modules/cohesion_elements/src/Entity/Component.php
+@@ -256,7 +256,7 @@ class Component extends CohesionElementEntityBase implements CohesionSettingsInt
+       $storage = \Drupal::entityTypeManager()->getStorage('component_content');
+       $query = $storage->getQuery()->condition('component', $entity->id());
+ 
+-      $ids = $query->execute();
++      $ids = $query->accessCheck(FALSE)->execute();
+       $entities = $storage->loadMultiple($ids);
+       $storage->delete($entities);
+ 
+diff --git a/cohesion/modules/cohesion_elements/src/Form/CategoryForm.php b/cohesion/modules/cohesion_elements/src/Form/CategoryForm.php
+index 9c541ad..72c80c9 100644
+--- a/cohesion/modules/cohesion_elements/src/Form/CategoryForm.php
++++ b/cohesion/modules/cohesion_elements/src/Form/CategoryForm.php
+@@ -116,7 +116,7 @@ class CategoryForm extends EntityForm {
+         ->range(0, 1)
+         ->sort('weight', 'desc');
+ 
+-      if ($ids = $query->execute()) {
++      if ($ids = $query->accessCheck(FALSE)->execute()) {
+         if ($weight_entity = $storage->load(reset($ids))) {
+           $this->entity->setWeight($weight_entity->getWeight() + 1);
+         }
+diff --git a/cohesion/modules/cohesion_style_guide/cohesion_style_guide.module b/cohesion/modules/cohesion_style_guide/cohesion_style_guide.module
+index f390798..904bc79 100644
+--- a/cohesion/modules/cohesion_style_guide/cohesion_style_guide.module
++++ b/cohesion/modules/cohesion_style_guide/cohesion_style_guide.module
+@@ -107,6 +107,7 @@ function cohesion_style_guide_token_info() {
+   $style_guide_ids = $style_guide_storage->getQuery()
+     ->sort('weight')
+     ->condition('status', TRUE)
++    ->accessCheck(FALSE)
+     ->execute();
+   $style_guides = $style_guide_storage->loadMultiple($style_guide_ids);
+ 
+diff --git a/cohesion/modules/cohesion_style_guide/src/Entity/StyleGuide.php b/cohesion/modules/cohesion_style_guide/src/Entity/StyleGuide.php
+index ff61627..f1367fa 100644
+--- a/cohesion/modules/cohesion_style_guide/src/Entity/StyleGuide.php
++++ b/cohesion/modules/cohesion_style_guide/src/Entity/StyleGuide.php
+@@ -150,7 +150,7 @@ class StyleGuide extends CohesionConfigEntityBase implements CohesionSettingsInt
+     // referencing this style guide entity.
+     $style_guide_manager_storage = $this->entityTypeManager()
+       ->getStorage('cohesion_style_guide_manager');
+-    $style_guide_manager_ids = $style_guide_manager_storage->getQuery()
++    $style_guide_manager_ids = $style_guide_manager_storage->accessCheck(FALSE)->getQuery()
+       ->condition('style_guide_uuid', $this->uuid())->execute();
+ 
+     if ($style_guide_managers = $style_guide_manager_storage->loadMultiple($style_guide_manager_ids)) {
+diff --git a/cohesion/modules/cohesion_style_guide/src/Plugin/Usage/StyleGuideManagerUsage.php b/cohesion/modules/cohesion_style_guide/src/Plugin/Usage/StyleGuideManagerUsage.php
+index 22421f2..ffa7726 100644
+--- a/cohesion/modules/cohesion_style_guide/src/Plugin/Usage/StyleGuideManagerUsage.php
++++ b/cohesion/modules/cohesion_style_guide/src/Plugin/Usage/StyleGuideManagerUsage.php
+@@ -122,6 +122,7 @@ class StyleGuideManagerUsage extends UsagePluginBase {
+           ->getQuery()
+           ->condition('theme', $base_theme_id)
+           ->condition('style_guide_uuid', $entity->get('style_guide_uuid'))
++          ->accessCheck(FALSE)
+           ->execute();
+ 
+         $style_guide_managers_id = array_shift($style_guide_managers);
+diff --git a/cohesion/modules/cohesion_style_guide/src/Services/StyleGuideManagerHandler.php b/cohesion/modules/cohesion_style_guide/src/Services/StyleGuideManagerHandler.php
+index d534f25..ff659f0 100644
+--- a/cohesion/modules/cohesion_style_guide/src/Services/StyleGuideManagerHandler.php
++++ b/cohesion/modules/cohesion_style_guide/src/Services/StyleGuideManagerHandler.php
+@@ -74,6 +74,7 @@ class StyleGuideManagerHandler {
+     $style_guide_managers_ids = $this->entityTypeManager->getStorage('cohesion_style_guide_manager')
+       ->getQuery()
+       ->condition('theme', $theme_id)
++      ->accessCheck(FALSE)
+       ->execute();
+ 
+     /** @var \Drupal\cohesion_style_guide\Entity\StyleGuideManager[] $style_guide_managers */
+@@ -187,7 +188,8 @@ class StyleGuideManagerHandler {
+     $style_guide_manager_form = [];
+     /** @var \Drupal\cohesion_style_guide\Entity\StyleGuide[] $style_guides */
+     $style_guide_storage = $this->entityTypeManager
+-      ->getStorage('cohesion_style_guide');
++      ->getStorage('cohesion_style_guide')
++      ->accessCheck(FALSE);
+ 
+     $style_guide_ids = $style_guide_storage->getQuery()
+       ->sort('weight')
+@@ -225,7 +227,7 @@ class StyleGuideManagerHandler {
+ 
+     $in_use_entities = [];
+     if (isset($this->themeHandler->listInfo()[$theme_id])) {
+-      $theme = $this->themeHandler->listInfo()[$theme_id];
++      $theme = $this->themeHandler->accessCheck(FALSE)->listInfo()[$theme_id];
+ 
+       $style_guide_managers_ids = $this->entityTypeManager->getStorage('cohesion_style_guide_manager')
+         ->getQuery()
+@@ -342,7 +344,7 @@ class StyleGuideManagerHandler {
+ 
+       // Load all style enabled guides and extract token names.
+       /** @var \Drupal\cohesion_style_guide\Entity\StyleGuide[] $style_guides */
+-      $style_guide_storage = \Drupal::entityTypeManager()
++      $style_guide_storage = \Drupal::entityTypeManager()->accessCheck(FALSE)
+         ->getStorage('cohesion_style_guide');
+       $style_guide_ids = $style_guide_storage->getQuery()
+         ->sort('weight')
+diff --git a/cohesion/modules/cohesion_style_helpers/src/Controller/StyleHelpersEndpointController.php b/cohesion/modules/cohesion_style_helpers/src/Controller/StyleHelpersEndpointController.php
+index 5cf31d7..af23332 100644
+--- a/cohesion/modules/cohesion_style_helpers/src/Controller/StyleHelpersEndpointController.php
++++ b/cohesion/modules/cohesion_style_helpers/src/Controller/StyleHelpersEndpointController.php
+@@ -137,7 +137,7 @@ class StyleHelpersEndpointController extends ControllerBase {
+    */
+   private function styleHelperEntities() {
+     try {
+-      $ids = \Drupal::service('entity_type.manager')->getStorage('cohesion_style_helper')->getQuery()->condition('status', TRUE)->condition('selectable', TRUE)->execute();
++      $ids = \Drupal::service('entity_type.manager')->accessCheck(FALSE)->getStorage('cohesion_style_helper')->getQuery()->condition('status', TRUE)->condition('selectable', TRUE)->execute();
+ 
+       return \Drupal::service('entity_type.manager')->getStorage('cohesion_style_helper')->loadMultiple($ids);
+     }
+@@ -188,7 +188,7 @@ class StyleHelpersEndpointController extends ControllerBase {
+    */
+   private function checkDuplicateByLabel($entity_type_id, $label) {
+     try {
+-      return \Drupal::entityQuery($entity_type_id)->condition('label', trim($label), '=')->count()->execute();
++      return \Drupal::entityQuery($entity_type_id)->accessCheck(FALSE)->condition('label', trim($label), '=')->count()->execute();
+     }
+     catch (PluginNotFoundException $ex) {
+       watchdog_exception('cohesion', $ex);
+diff --git a/cohesion/modules/cohesion_sync/src/Controller/PackageFormRefreshController.php b/cohesion/modules/cohesion_sync/src/Controller/PackageFormRefreshController.php
+index 2877085..72a8777 100644
+--- a/cohesion/modules/cohesion_sync/src/Controller/PackageFormRefreshController.php
++++ b/cohesion/modules/cohesion_sync/src/Controller/PackageFormRefreshController.php
+@@ -144,6 +144,7 @@ class PackageFormRefreshController extends ControllerBase {
+       $ids = $this->entityTypeManager->getStorage($type)
+         ->getQuery()
+         ->condition($entity_type->getKey('uuid'), $uuids, 'IN')
++        ->accessCheck(FALSE)
+         ->execute();
+ 
+       $entities = $this->entityTypeManager->getStorage($type)
+diff --git a/cohesion/modules/cohesion_sync/src/PackagerManager.php b/cohesion/modules/cohesion_sync/src/PackagerManager.php
+index 2f4c246..1b92d35 100644
+--- a/cohesion/modules/cohesion_sync/src/PackagerManager.php
++++ b/cohesion/modules/cohesion_sync/src/PackagerManager.php
+@@ -738,7 +738,7 @@ class PackagerManager {
+           // Loop through the results and add them to the dependencies.
+           foreach ($typed_uuids as $type => $uuids) {
+             $entity_type = $this->entityTypeManager->getDefinition($type);
+-            $ids = $this->entityTypeManager->getStorage($type)->getQuery()->condition($entity_type->getKey('uuid'), $uuids, 'IN')->execute();
++            $ids = $this->entityTypeManager->getStorage($type)->accessCheck(FALSE)->getQuery()->condition($entity_type->getKey('uuid'), $uuids, 'IN')->execute();
+ 
+             $entities = $this->entityTypeManager->getStorage($type)->loadMultiple($ids);
+ 
+diff --git a/cohesion/modules/cohesion_templates/cohesion_templates.module b/cohesion/modules/cohesion_templates/cohesion_templates.module
+index 3e5a5e0..02e3431 100644
+--- a/cohesion/modules/cohesion_templates/cohesion_templates.module
++++ b/cohesion/modules/cohesion_templates/cohesion_templates.module
+@@ -270,6 +270,7 @@ function _cohesion_templates_get_template_candidate(ContentEntityInterface $enti
+     ->sort('default', 'DESC')
+   // We only need to find the first template, as we know they all exist.
+     ->sort('bundle', 'DESC')
++    ->accessCheck(FALSE)
+     ->execute();
+ 
+   return [
+@@ -449,6 +450,7 @@ function _cohesion_templates_get_master_template() {
+     $candidate_template_ids = \Drupal::service('entity_type.manager')->getStorage('cohesion_master_templates')->getQuery()
+       ->condition('default', TRUE)
+       ->condition('status', TRUE)
++      ->accessCheck(FALSE)
+       ->execute();
+ 
+     if (count($candidate_template_ids) > 0) {
+diff --git a/cohesion/modules/cohesion_templates/src/ContentTemplatesListBuilder.php b/cohesion/modules/cohesion_templates/src/ContentTemplatesListBuilder.php
+index d25c136..6ddda76 100644
+--- a/cohesion/modules/cohesion_templates/src/ContentTemplatesListBuilder.php
++++ b/cohesion/modules/cohesion_templates/src/ContentTemplatesListBuilder.php
+@@ -47,7 +47,7 @@ class ContentTemplatesListBuilder extends CohesionListBuilder {
+   public function load() {
+     $entity_type = \Drupal::routeMatch()->getParameter('content_entity_type');
+     $candidate_template_ids = \Drupal::service('entity_type.manager')->getStorage('cohesion_content_templates')->getQuery()
+-      ->condition('entity_type', $entity_type)->execute();
++      ->condition('entity_type', $entity_type)->accessCheck(FALSE)->execute();
+ 
+     if ($candidate_template_ids) {
+       $candidate_templates = $this->storage->loadMultiple($candidate_template_ids);
+diff --git a/cohesion/modules/cohesion_templates/src/Controller/CohesionContentTemplatesListController.php b/cohesion/modules/cohesion_templates/src/Controller/CohesionContentTemplatesListController.php
+index 18181be..2d4d07d 100644
+--- a/cohesion/modules/cohesion_templates/src/Controller/CohesionContentTemplatesListController.php
++++ b/cohesion/modules/cohesion_templates/src/Controller/CohesionContentTemplatesListController.php
+@@ -58,7 +58,7 @@ class CohesionContentTemplatesListController extends ControllerBase {
+    */
+   public function listing($entity_type) {
+ 
+-    $templates_ids = $this->entityTypeManager->getStorage('cohesion_content_templates')->getQuery()->execute();
++    $templates_ids = $this->entityTypeManager->getStorage('cohesion_content_templates')->getQuery()->accessCheck(FALSE)->execute();
+ 
+     if ($templates_ids) {
+       $candidate_template_storage = $this->entityTypeManager->getStorage('cohesion_content_templates');
+diff --git a/cohesion/modules/cohesion_templates/src/Entity/ContentTemplates.php b/cohesion/modules/cohesion_templates/src/Entity/ContentTemplates.php
+index 8e7d7cc..f53df65 100644
+--- a/cohesion/modules/cohesion_templates/src/Entity/ContentTemplates.php
++++ b/cohesion/modules/cohesion_templates/src/Entity/ContentTemplates.php
+@@ -118,6 +118,7 @@ class ContentTemplates extends CohesionTemplateBase implements CohesionSettingsI
+         ->condition('bundle', $this->get('bundle'))
+         ->condition('view_mode', $this->get('view_mode'))
+         ->condition('default', TRUE)
++        ->accessCheck(FALSE)
+         ->condition('id', $this->id(), '<>')
+         ->execute();
+ 
+@@ -162,6 +163,7 @@ class ContentTemplates extends CohesionTemplateBase implements CohesionSettingsI
+           $already_imported_ids = \Drupal::service('entity_type.manager')->getStorage('cohesion_content_templates')->getQuery()
+             ->condition('entity_type', $entity_type)
+             ->condition('bundle', $bundle_id)
++            ->accessCheck(FALSE)
+             ->condition('view_mode', $view_mode)
+             ->execute();
+ 
+@@ -200,6 +202,7 @@ class ContentTemplates extends CohesionTemplateBase implements CohesionSettingsI
+           $already_imported_ids = \Drupal::service('entity_type.manager')->getStorage('cohesion_content_templates')->getQuery()
+             ->condition('entity_type', $entity_type)
+             ->condition('bundle', $bundle_id)
++            ->accessCheck(FALSE)
+             ->condition('view_mode', $view_mode)
+             ->execute();
+ 
+@@ -338,6 +341,7 @@ class ContentTemplates extends CohesionTemplateBase implements CohesionSettingsI
+         ->condition('entity_type', $this->get('entity_type'))
+         ->condition('bundle', $this->get('bundle'))
+         ->condition('view_mode', $this->get('view_mode'))
++        ->accessCheck(FALSE)
+         ->execute();
+       if (count($candidate_template_ids) > 1) {
+         $this->delete();
+diff --git a/cohesion/modules/cohesion_templates/src/Entity/MasterTemplates.php b/cohesion/modules/cohesion_templates/src/Entity/MasterTemplates.php
+index b502c2b..e849ce0 100644
+--- a/cohesion/modules/cohesion_templates/src/Entity/MasterTemplates.php
++++ b/cohesion/modules/cohesion_templates/src/Entity/MasterTemplates.php
+@@ -120,7 +120,7 @@ class MasterTemplates extends CohesionTemplateBase implements CohesionSettingsIn
+ 
+     if ($this->get('default') === TRUE) {
+       $default_templates_ids = \Drupal::service('entity_type.manager')->getStorage('cohesion_master_templates')->getQuery()
+-        ->condition('default', TRUE)->condition('id', $this->id(), '<>')->execute();
++        ->condition('default', TRUE)->accessCheck(FALSE)->condition('id', $this->id(), '<>')->execute();
+ 
+       $default_templates = $this->loadMultiple($default_templates_ids);
+       foreach ($default_templates as $default_template) {
+diff --git a/cohesion/modules/cohesion_templates/src/Form/ContentTemplatesForm.php b/cohesion/modules/cohesion_templates/src/Form/ContentTemplatesForm.php
+index 7cfd110..dfcef48 100644
+--- a/cohesion/modules/cohesion_templates/src/Form/ContentTemplatesForm.php
++++ b/cohesion/modules/cohesion_templates/src/Form/ContentTemplatesForm.php
+@@ -129,7 +129,7 @@ class ContentTemplatesForm extends TemplateForm {
+     // Show default & master template fields for full content templates.
+     if ($view_mode == 'full') {
+       $master_template_ids = \Drupal::service('entity_type.manager')->getStorage('cohesion_master_templates')->getQuery()
+-        ->condition('status', TRUE)->condition('selectable', TRUE)->execute();
++        ->condition('status', TRUE)->accessCheck(FALSE)->condition('selectable', TRUE)->execute();
+       $master_template_storage = $this->entityTypeManager->getStorage('cohesion_master_templates');
+       $master_templates = $master_template_storage->loadMultiple($master_template_ids);
+ 
+diff --git a/cohesion/modules/cohesion_templates/src/Plugin/Derivative/CohesionContentTemplateLocalTasks.php b/cohesion/modules/cohesion_templates/src/Plugin/Derivative/CohesionContentTemplateLocalTasks.php
+index b796f52..64cf20b 100644
+--- a/cohesion/modules/cohesion_templates/src/Plugin/Derivative/CohesionContentTemplateLocalTasks.php
++++ b/cohesion/modules/cohesion_templates/src/Plugin/Derivative/CohesionContentTemplateLocalTasks.php
+@@ -18,7 +18,7 @@ class CohesionContentTemplateLocalTasks extends DeriverBase {
+    */
+   public function getDerivativeDefinitions($base_plugin_definition) {
+ 
+-    $templates_ids = \Drupal::service('entity_type.manager')->getStorage('cohesion_content_templates')->getQuery()->execute();
++    $templates_ids = \Drupal::service('entity_type.manager')->accessCheck(FALSE)->getStorage('cohesion_content_templates')->getQuery()->execute();
+ 
+     if ($templates_ids) {
+       $entity_types = \Drupal::entityTypeManager()->getDefinitions();
+diff --git a/cohesion/modules/cohesion_templates/src/Plugin/Derivative/CohesionContentTemplateMenuLink.php b/cohesion/modules/cohesion_templates/src/Plugin/Derivative/CohesionContentTemplateMenuLink.php
+index 43bde7a..25c4dc3 100644
+--- a/cohesion/modules/cohesion_templates/src/Plugin/Derivative/CohesionContentTemplateMenuLink.php
++++ b/cohesion/modules/cohesion_templates/src/Plugin/Derivative/CohesionContentTemplateMenuLink.php
+@@ -45,7 +45,7 @@ class CohesionContentTemplateMenuLink extends DeriverBase implements ContainerDe
+ 
+     $links = [];
+ 
+-    $templates_ids = $this->entityTypeManager->getStorage('cohesion_content_templates')->getQuery()->execute();
++    $templates_ids = $this->entityTypeManager->getStorage('cohesion_content_templates')->accessCheck(FALSE)->getQuery()->execute();
+ 
+     if ($templates_ids) {
+       $entity_types = $this->entityTypeManager->getDefinitions();
+diff --git a/cohesion/modules/cohesion_templates/src/Plugin/Field/FieldWidget/CohesionTemplateSelectorFieldWidget.php b/cohesion/modules/cohesion_templates/src/Plugin/Field/FieldWidget/CohesionTemplateSelectorFieldWidget.php
+index ecffda0..6cf3f50 100644
+--- a/cohesion/modules/cohesion_templates/src/Plugin/Field/FieldWidget/CohesionTemplateSelectorFieldWidget.php
++++ b/cohesion/modules/cohesion_templates/src/Plugin/Field/FieldWidget/CohesionTemplateSelectorFieldWidget.php
+@@ -49,7 +49,7 @@ class CohesionTemplateSelectorFieldWidget extends WidgetBase {
+     }
+ 
+     // Get list of templates for this content type.
+-    $template_ids = \Drupal::service('entity_type.manager')->getStorage('cohesion_content_templates')->getQuery()
++    $template_ids = \Drupal::service('entity_type.manager')->accessCheck(FALSE)->getStorage('cohesion_content_templates')->getQuery()
+       ->condition('entity_type', $entity_type)
+       ->condition('bundle', $bundle)
+       ->condition('view_mode', 'full')
+diff --git a/cohesion/modules/cohesion_templates/src/Plugin/Usage/MasterTemplatesUsage.php b/cohesion/modules/cohesion_templates/src/Plugin/Usage/MasterTemplatesUsage.php
+index 06685c6..2d5d642 100644
+--- a/cohesion/modules/cohesion_templates/src/Plugin/Usage/MasterTemplatesUsage.php
++++ b/cohesion/modules/cohesion_templates/src/Plugin/Usage/MasterTemplatesUsage.php
+@@ -54,7 +54,7 @@ class MasterTemplatesUsage extends UsagePluginBase {
+         // If it's set as default, get the default master template id.
+         if ($entry['id'] == '__none__') {
+ 
+-          $master_template_id = $this->storage->getQuery('AND')->condition('default', TRUE)->execute();
++          $master_template_id = $this->storage->getQuery('AND')->accessCheck(FALSE)->condition('default', TRUE)->execute();
+ 
+           if ($master_template_id) {
+             $master_template_id = array_shift($master_template_id);

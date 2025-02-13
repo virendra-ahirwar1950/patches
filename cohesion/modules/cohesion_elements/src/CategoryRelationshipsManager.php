@@ -54,7 +54,7 @@ class CategoryRelationshipsManager {
       // Is this category in use anywhere?
       $query = $element_storage->getQuery()->condition('category', $category_id, '=');
 
-      if ($entity_ids = $query->execute()) {
+      if ($entity_ids = $query->accessCheck(FALSE)->execute()) {
 
         $this->createUncategorized($category_storage, $default_category_id);
 

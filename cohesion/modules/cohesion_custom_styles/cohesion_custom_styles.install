@@ -56,6 +56,7 @@ function cohesion_custom_styles_update_8402(&$variables) {
           ->condition('parent', $parent->getClass(), '=')
           ->sort('label', 'ASC')
           ->sort('weight', 'ASC')
+          ->accessCheck(FALSE)
           ->execute();
 
         if($children_styles){

@@ -1,0 +1,4 @@
+services:
+  coh_profile.site_setup:
+    class: '\Drupal\coh_profile\SiteSetup'
+    arguments: ['@config.factory', '@router.builder', '@module_installer', '@module_handler', '@entity_type.manager', '@theme_installer', '@theme_handler']

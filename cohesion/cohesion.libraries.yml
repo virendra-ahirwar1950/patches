@@ -32,7 +32,7 @@ drupal.machine-name:
     js/machine-name.js: {}
   dependencies:
     - core/jquery
-    - core/jquery.once
+    - core/once
     - core/drupal
     - core/drupalSettings
     - core/drupal.form

@@ -74,11 +74,11 @@ class ComponentListBuilder extends ElementsListBuilder {
 
     $categories_query = $this->entityTypeManager->getStorage($category_type_id)->getQuery()->sort('weight', 'asc');
 
-    if ($categories = $this->entityTypeManager->getStorage($category_type_id)->loadMultiple($categories_query->execute())) {
+    if ($categories = $this->entityTypeManager->accessCheck(FALSE)->getStorage($category_type_id)->loadMultiple($categories_query->execute())) {
       foreach ($categories as $category) {
 
         $query = $this->entityTypeManager->getStorage($this->entityType->id())->getQuery()->condition('category', $category->id())->sort('weight', 'asc');
-        $entities = $this->entityTypeManager->getStorage($this->entityType->id())->loadMultiple($query->execute());
+        $entities = $this->entityTypeManager->accessCheck(FALSE)->getStorage($this->entityType->id())->loadMultiple($query->execute());
 
         // Add custom components.
         if ($custom_components = $this->customComponentsService->getComponentsInCategory(ComponentCategory::load($category->id()))) {
@@ -86,7 +86,7 @@ class ComponentListBuilder extends ElementsListBuilder {
         }
 
         // Count UI & Custom components.
-        $count = $query->count()->execute() + count($custom_components);
+        $count = $query->count()->accessCheck(FALSE)->execute() + count($custom_components);
 
         // Build the accordions.
         $form[$this->entityType->id()][$category->id()]['accordion'] = [

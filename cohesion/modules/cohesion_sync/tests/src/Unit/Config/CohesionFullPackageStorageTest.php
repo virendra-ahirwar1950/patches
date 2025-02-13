@@ -15,7 +15,8 @@ use Drupal\Tests\UnitTestCase;
  *
  * @package Drupal\Tests\cohesion_sync\Unit\Config
  */
-class CohesionFullPackageStorageTest extends UnitTestCase {
+class CohesionFullPackageStorageTest extends UnitTestCase
+{
 
   /**
    * The main drupal config storage.
@@ -57,7 +58,8 @@ class CohesionFullPackageStorageTest extends UnitTestCase {
   /**
    * @inheritDoc
    */
-  public function setUp() {
+  public function setUp()
+  {
     parent::setUp();
     $this->configStorage = $this->getMockBuilder(StorageInterface::class)
       ->disableOriginalConstructor()
@@ -134,14 +136,24 @@ class CohesionFullPackageStorageTest extends UnitTestCase {
    *
    * @covers Drupal\cohesion_sync\Config\CohesionFullPackageStorage::listAll
    */
-  public function testListAll() {
+  public function testListAll()
+  {
     $this->configStorage->expects($this->any())
       ->method('listAll')
       ->willReturn(array_keys($this->configs));
     $this->storage = new CohesionFullPackageStorage($this->configStorage, $this->configManager, $this->usagePluginManager);
 
-    $this->assertArrayEquals($this->storage->listAll(), ['cohesion_elements.cohesion_component.config_id'], 'ListAll show only contain the cohesion component');
-    $this->assertArrayEquals($this->storage->listAll('some_prefix'), ['cohesion_elements.cohesion_component.config_id'], 'ListAll show only contain the cohesion component regardless of the prefix');
+    $this->assertEqualsCanonicalizing(
+      ['cohesion_elements.cohesion_component.config_id'],
+      $this->storage->listAll(),
+      'ListAll should only contain the cohesion component'
+    );
+
+    $this->assertEqualsCanonicalizing(
+      ['cohesion_elements.cohesion_component.config_id'],
+      $this->storage->listAll('some_prefix'),
+      'ListAll should only contain the cohesion component regardless of the prefix'
+    );
   }
 
   /**
@@ -149,7 +161,8 @@ class CohesionFullPackageStorageTest extends UnitTestCase {
    *
    * @covers Drupal\cohesion_sync\Config\CohesionFullPackageStorage::read
    */
-  public function testRead() {
+  public function testRead()
+  {
     $this->configStorage->expects($this->any())
       ->method('listAll')
       ->willReturn(array_keys($this->configs));
@@ -165,7 +178,8 @@ class CohesionFullPackageStorageTest extends UnitTestCase {
    *
    * @covers Drupal\cohesion_sync\Config\CohesionFullPackageStorage::exists
    */
-  public function testExists() {
+  public function testExists()
+  {
     $this->configStorage->expects($this->any())
       ->method('listAll')
       ->willReturn(array_keys($this->configs));
@@ -181,7 +195,8 @@ class CohesionFullPackageStorageTest extends UnitTestCase {
    *
    * @covers Drupal\cohesion_sync\Config\CohesionFullPackageStorage::buildDependencies
    */
-  public function testBuildDependencies() {
+  public function testBuildDependencies()
+  {
     $this->configs['some_module.config.with_dependencies'] =  [
       'entity_type' => 'cohesion_component',
       'exists' => TRUE,
@@ -230,7 +245,8 @@ class CohesionFullPackageStorageTest extends UnitTestCase {
    *
    * @covers Drupal\cohesion_sync\Config\CohesionFullPackageStorage::configStatus
    */
-  public function testConfigStatus() {
+  public function testConfigStatus()
+  {
     $this->configs['some_module.config.without_status'] = [
       'entity_type' => 'cohesion_component',
       'exists' => TRUE,
@@ -267,7 +283,8 @@ class CohesionFullPackageStorageTest extends UnitTestCase {
    * @covers Drupal\cohesion_sync\Config\CohesionFullPackageStorage::getStorageFileList
    * @covers Drupal\cohesion_sync\Config\CohesionFullPackageStorage::buildStorageFileList
    */
-  public function testGetStorageFileList() {
+  public function testGetStorageFileList()
+  {
     $this->configs['config_with.file.dependency'] = [
       'entity_type' => 'cohesion_component',
       'exists' => TRUE,
@@ -324,9 +341,11 @@ class CohesionFullPackageStorageTest extends UnitTestCase {
       'dependency_5' => 'file',
       'dependency_4' => 'file',
     ];
-    $this->assertArrayEquals($excepted, $this->storage->getStorageFileList(), 'getStorageFileList should contain file dependency');
-
-
+    $this->assertEqualsCanonicalizing(
+      $excepted,
+      $this->storage->getStorageFileList(),
+      'getStorageFileList should contain file dependency'
+    );
   }
 
   /**
@@ -340,7 +359,8 @@ class CohesionFullPackageStorageTest extends UnitTestCase {
    *
    * @covers Drupal\cohesion_sync\Config\CohesionFullPackageStorage::getIncludedEntityTypes
    */
-  public function testGetIncludedEntityTypes($config, $results) {
+  public function testGetIncludedEntityTypes($config, $results)
+  {
 
     if ($config == NULL) {
       $this->configs = [];
@@ -350,14 +370,13 @@ class CohesionFullPackageStorageTest extends UnitTestCase {
       $this->storage = new CohesionFullPackageStorage($this->configStorage, $this->configManager, $this->usagePluginManager);
       $this->expectException(\Exception::class);
       $this->storage->getIncludedEntityTypes();
-    }
-    else {
+    } else {
       $this->configs = $config;
       $this->configStorage->expects($this->any())
         ->method('listAll')
         ->willReturn(array_keys($this->configs));
       $this->storage = new CohesionFullPackageStorage($this->configStorage, $this->configManager, $this->usagePluginManager);
-      $this->assertArrayEquals($results, $this->storage->getIncludedEntityTypes());
+      $this->assertEqualsCanonicalizing($results, $this->storage->getIncludedEntityTypes());
     }
   }
 
@@ -365,7 +384,8 @@ class CohesionFullPackageStorageTest extends UnitTestCase {
    * Data provider for ::testGetIncludedEntityTypes.
    * @return array
    */
-  public function dataGetIncludedEntityTypes() {
+  public function dataGetIncludedEntityTypes()
+  {
 
     $items = [];
 

@@ -165,7 +165,7 @@ class CustomStyle extends CohesionConfigEntityBase implements CohesionSettingsIn
       return FALSE;
     }
 
-    if ($ids = $storage->getQuery()->condition('class_name', $this->getParent())->execute()) {
+    if ($ids = $storage->accessCheck(FALSE)->getQuery()->condition('class_name', $this->getParent())->execute()) {
 
       return reset($ids);
 
@@ -202,7 +202,7 @@ class CustomStyle extends CohesionConfigEntityBase implements CohesionSettingsIn
 
     // If this is a parent item, attempt to get the child entities.
     if (!$this->getParent()) {
-      $ids = $storage->getQuery()->condition('parent', $this->getClass())->execute();
+      $ids = $storage->accessCheck(FALSE)->getQuery()->condition('parent', $this->getClass())->execute();
       $entities = $storage->loadMultiple($ids);
     }
 
@@ -428,7 +428,7 @@ class CustomStyle extends CohesionConfigEntityBase implements CohesionSettingsIn
     $entity_type_manager = \Drupal::entityTypeManager();
     $storage = $entity_type_manager->getStorage($entity_type_repository->getEntityTypeFromClass(get_called_class()));
 
-    $parent_ids = $storage->getQuery()->notExists('parent')
+    $parent_ids = $storage->accessCheck(FALSE)->getQuery()->notExists('parent')
       ->sort('label', 'ASC')
       ->sort('weight', 'ASC')
       ->execute();
@@ -439,7 +439,7 @@ class CustomStyle extends CohesionConfigEntityBase implements CohesionSettingsIn
 
         /** @var CustomStyle $parent */
         if ($parent = self::load($entityId)) {
-          $children = $storage->getQuery()
+          $children = $storage->accessCheck(FALSE)->getQuery()
             ->condition('parent', $parent->getClass(), '=')
             ->sort('label', 'ASC')
             ->sort('weight', 'ASC')

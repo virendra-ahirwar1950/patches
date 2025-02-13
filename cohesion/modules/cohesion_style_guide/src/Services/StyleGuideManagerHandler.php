@@ -74,6 +74,7 @@ class StyleGuideManagerHandler {
     $style_guide_managers_ids = $this->entityTypeManager->getStorage('cohesion_style_guide_manager')
       ->getQuery()
       ->condition('theme', $theme_id)
+      ->accessCheck(FALSE)
       ->execute();
 
     /** @var \Drupal\cohesion_style_guide\Entity\StyleGuideManager[] $style_guide_managers */
@@ -187,7 +188,8 @@ class StyleGuideManagerHandler {
     $style_guide_manager_form = [];
     /** @var \Drupal\cohesion_style_guide\Entity\StyleGuide[] $style_guides */
     $style_guide_storage = $this->entityTypeManager
-      ->getStorage('cohesion_style_guide');
+      ->getStorage('cohesion_style_guide')
+      ->accessCheck(FALSE);
 
     $style_guide_ids = $style_guide_storage->getQuery()
       ->sort('weight')
@@ -225,7 +227,7 @@ class StyleGuideManagerHandler {
 
     $in_use_entities = [];
     if (isset($this->themeHandler->listInfo()[$theme_id])) {
-      $theme = $this->themeHandler->listInfo()[$theme_id];
+      $theme = $this->themeHandler->accessCheck(FALSE)->listInfo()[$theme_id];
 
       $style_guide_managers_ids = $this->entityTypeManager->getStorage('cohesion_style_guide_manager')
         ->getQuery()
@@ -342,7 +344,7 @@ class StyleGuideManagerHandler {
 
       // Load all style enabled guides and extract token names.
       /** @var \Drupal\cohesion_style_guide\Entity\StyleGuide[] $style_guides */
-      $style_guide_storage = \Drupal::entityTypeManager()
+      $style_guide_storage = \Drupal::entityTypeManager()->accessCheck(FALSE)
         ->getStorage('cohesion_style_guide');
       $style_guide_ids = $style_guide_storage->getQuery()
         ->sort('weight')

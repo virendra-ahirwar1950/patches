@@ -212,7 +212,7 @@ class CustomStylesForm extends CohesionStyleBuilderForm {
     if ($form_state->getValue('original_class_name') !== $this->entity->getClass()) {
 
       $storage = $this->entityTypeManager->getStorage('cohesion_custom_style');
-      $ids = $storage->getQuery()->condition('parent', $form_state->getValue('original_class_name') ?? '')->execute();
+      $ids = $storage->accessCheck(FALSE)->getQuery()->condition('parent', $form_state->getValue('original_class_name') ?? '')->execute();
 
       // Loop over the children.
       foreach ($storage->loadMultiple($ids) as $child_entity) {
@@ -273,7 +273,7 @@ class CustomStylesForm extends CohesionStyleBuilderForm {
 
     $query = $this->entityTypeManager->getStorage('cohesion_custom_style')->getQuery();
     $query->condition('class_name', custom_style_class_prefix . $value);
-    $entity_ids = $query->execute();
+    $entity_ids = $query->accessCheck(FALSE)->execute();
 
     return count($entity_ids) > 0;
   }

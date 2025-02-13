@@ -116,7 +116,7 @@ class CategoryForm extends EntityForm {
         ->range(0, 1)
         ->sort('weight', 'desc');
 
-      if ($ids = $query->execute()) {
+      if ($ids = $query->accessCheck(FALSE)->execute()) {
         if ($weight_entity = $storage->load(reset($ids))) {
           $this->entity->setWeight($weight_entity->getWeight() + 1);
         }

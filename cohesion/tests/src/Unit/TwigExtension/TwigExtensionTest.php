@@ -78,7 +78,7 @@ class TwigExtensionTest extends UnitTestCase {
     $this->route->method('getOption')->with('sitestudio_build')->willReturn($is_page_builder);
     $this->cohesion_current_route_match->method('getRouteEntities')->willReturn([$page_entity]);
     $test_build = $this->twigExtension->addComponentFrontEndBuilderMarkup($input_build, $context, $componentInstanceUuid, $component_content_UUID, $component_content_id);
-    $this->assertArrayEquals($expectation, $test_build);
+    $this->assertEqualsCanonicalizing($expectation, $test_build);
   }
 
   /**

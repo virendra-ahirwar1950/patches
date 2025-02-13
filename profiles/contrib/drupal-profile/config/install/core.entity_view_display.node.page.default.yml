@@ -1,0 +1,29 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.page.field_layout
+    - field.field.node.page.field_meta_tags
+    - node.type.page
+  module:
+    - cohesion_elements
+    - user
+_core:
+  default_config_hash: u1uFqgu9N8YFGzUzD_wg3ZhT9fAr1DtkYyAgH2TVwkU
+id: node.page.default
+targetEntityType: node
+bundle: page
+mode: default
+content:
+  field_layout:
+    type: cohesion_entity_reference_revisions_entity_view
+    weight: 1
+    label: hidden
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    region: content
+hidden:
+  field_meta_tags: true
+  links: true

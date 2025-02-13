@@ -26,7 +26,7 @@ class LayoutCanvasTest extends UnitTestCase {
     $layout_canvas = new LayoutCanvas($json_values);
     $links = $layout_canvas->getLinksReferences();
 
-    $this->assertArrayEquals($expected_links, $links);
+    $this->assertEqualsCanonicalizing($expected_links, $links);
   }
 
   /**
@@ -38,7 +38,7 @@ class LayoutCanvasTest extends UnitTestCase {
     $layout_canvas = new LayoutCanvas($json_values);
     $references = $layout_canvas->getEntityReferences(TRUE, TRUE);
 
-    $this->assertArrayEquals($expected_references, $references);
+    $this->assertEqualsCanonicalizing($expected_references, $references);
   }
 
   /**

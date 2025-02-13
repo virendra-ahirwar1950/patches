@@ -1,0 +1,6 @@
+roleassign_roles:
+  content_editor: content_editor
+  administrator: '0'
+  coherence_admin: '0'
+_core:
+  default_config_hash: 1ag-p-Pdb1iG4hFFam8SPVtrYQ-TZJaHI4b1lz6xEAM

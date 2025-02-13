@@ -45,7 +45,7 @@ class CohesionContentTemplateMenuLink extends DeriverBase implements ContainerDe
 
     $links = [];
 
-    $templates_ids = $this->entityTypeManager->getStorage('cohesion_content_templates')->getQuery()->execute();
+    $templates_ids = $this->entityTypeManager->getStorage('cohesion_content_templates')->accessCheck(FALSE)->getQuery()->execute();
 
     if ($templates_ids) {
       $entity_types = $this->entityTypeManager->getDefinitions();

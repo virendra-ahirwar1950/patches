@@ -496,7 +496,7 @@ function cohesion_elements_update_8604(){
 
   foreach ($entity_types as $entity_type){
     $component_ids = \Drupal::entityTypeManager()->getStorage($entity_type)->getQuery()
-      ->sort('label', 'asc')->execute();
+      ->sort('label', 'asc')->accessCheck(FALSE)->execute();
     $components = \Drupal\cohesion_elements\Entity\Component::loadMultiple($component_ids);
     $weight = 0;
     foreach ($components as $component){
@@ -606,7 +606,7 @@ function cohesion_elements_update_8903() {
       ->condition('component', NULL , 'IS NULL');
 
     $component_content_ids = \Drupal::entityTypeManager()->getStorage('component_content')->getQuery()
-      ->condition($query_condition)->execute();
+      ->condition($query_condition)->accessCheck(FALSE)->execute();
 
     // If we have any ids then load and update the component field to have the component id.
     if ($component_content_ids) {

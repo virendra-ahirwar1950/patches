@@ -103,7 +103,7 @@ class ComponentContentController extends ControllerBase {
       }
     }
 
-    $ids = $query->execute();
+    $ids = $query->accessCheck(FALSE)->execute();
     /** @var \Drupal\cohesion_elements\Entity\ComponentContent[ $component_contents */
     $component_contents = $storage->loadMultiple($ids);
     $data = [];
@@ -354,12 +354,12 @@ class ComponentContentController extends ControllerBase {
 
     $categories_query = $this->entityTypeManager->getStorage($category_type_id)->getQuery()->sort('weight', 'asc');
 
-    if ($categories = $this->entityTypeManager->getStorage($category_type_id)->loadMultiple($categories_query->execute())) {
+    if ($categories = $this->entityTypeManager->accessCheck(FALSE)->getStorage($category_type_id)->loadMultiple($categories_query->execute())) {
       foreach ($categories as $category) {
 
         $query = $this->entityTypeManager->getStorage($entityType->id())->getQuery()->condition('category', $category->id())->sort('weight', 'asc');
 
-        $entities = $this->entityTypeManager->getStorage($entityType->id())->loadMultiple($query->execute());
+        $entities = $this->entityTypeManager->accessCheck(FALSE)->getStorage($entityType->id())->loadMultiple($query->execute());
 
         // Format the custom components as components.
         if ($custom_components = $this->customComponentsService->getComponentsInCategory(ComponentCategory::load($category->id()))) {
@@ -368,7 +368,7 @@ class ComponentContentController extends ControllerBase {
         }
 
         // Count UI & Custom components.
-        $count = $query->count()->execute() + count($custom_components);
+        $count = $query->accessCheck(FALSE)->count()->execute() + count($custom_components);
 
         // Build the accordions.
         $build[$entityType->id()][$category->id()]['accordion'] = [

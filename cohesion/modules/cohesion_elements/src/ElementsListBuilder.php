@@ -117,18 +117,18 @@ class ElementsListBuilder extends CohesionListBuilder implements FormInterface {
 
     $categories_query = $this->entityTypeManager->getStorage($category_type_id)->getQuery()->sort('weight', 'asc');
 
-    if ($categories = $this->entityTypeManager->getStorage($category_type_id)->loadMultiple($categories_query->execute())) {
+    if ($categories = $this->entityTypeManager->accessCheck(FALSE)->getStorage($category_type_id)->loadMultiple($categories_query->execute())) {
       foreach ($categories as $category) {
 
         $query = $this->entityTypeManager->getStorage($this->entityType->id())->getQuery()->condition('category', $category->id())->sort('weight', 'asc');
 
-        $entities = $this->entityTypeManager->getStorage($this->entityType->id())->loadMultiple($query->execute());
+        $entities = $this->entityTypeManager->accessCheck(FALSE)->getStorage($this->entityType->id())->loadMultiple($query->execute());
 
         // Build the accordions.
         $form[$this->entityType->id()][$category->id()]['accordion'] = [
           '#type' => 'details',
           '#open' => FALSE,
-          '#title' => $category->label() . ' (' . $query->count()->execute() . ')',
+          '#title' => $category->label() . ' (' . $query->count()->accessCheck(FALSE)->execute() . ')',
         ];
 
         // Build the accordion group tables.

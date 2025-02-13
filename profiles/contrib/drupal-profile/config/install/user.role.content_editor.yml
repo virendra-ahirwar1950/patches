@@ -1,0 +1,26 @@
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: L8vUodBesQlweQGoCn33ouoFOm_Fsev-moi32nYIaes
+id: content_editor
+label: 'Content editor'
+weight: 3
+is_admin: null
+permissions:
+  - 'access administration pages'
+  - 'access content'
+  - 'access content overview'
+  - 'access in-place editing'
+  - 'access toolbar'
+  - 'clone node entity'
+  - 'create page content'
+  - 'create url aliases'
+  - 'display eu cookie compliance popup'
+  - 'edit any page content'
+  - 'edit own page content'
+  - 'revert page revisions'
+  - 'use text format cohesion'
+  - 'view own unpublished content'
+  - 'view page revisions'
+  - 'view the administration theme'

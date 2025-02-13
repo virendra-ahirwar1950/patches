@@ -118,6 +118,7 @@ class ContentTemplates extends CohesionTemplateBase implements CohesionSettingsI
         ->condition('bundle', $this->get('bundle'))
         ->condition('view_mode', $this->get('view_mode'))
         ->condition('default', TRUE)
+        ->accessCheck(FALSE)
         ->condition('id', $this->id(), '<>')
         ->execute();
 
@@ -162,6 +163,7 @@ class ContentTemplates extends CohesionTemplateBase implements CohesionSettingsI
           $already_imported_ids = \Drupal::service('entity_type.manager')->getStorage('cohesion_content_templates')->getQuery()
             ->condition('entity_type', $entity_type)
             ->condition('bundle', $bundle_id)
+            ->accessCheck(FALSE)
             ->condition('view_mode', $view_mode)
             ->execute();
 
@@ -200,6 +202,7 @@ class ContentTemplates extends CohesionTemplateBase implements CohesionSettingsI
           $already_imported_ids = \Drupal::service('entity_type.manager')->getStorage('cohesion_content_templates')->getQuery()
             ->condition('entity_type', $entity_type)
             ->condition('bundle', $bundle_id)
+            ->accessCheck(FALSE)
             ->condition('view_mode', $view_mode)
             ->execute();
 
@@ -338,6 +341,7 @@ class ContentTemplates extends CohesionTemplateBase implements CohesionSettingsI
         ->condition('entity_type', $this->get('entity_type'))
         ->condition('bundle', $this->get('bundle'))
         ->condition('view_mode', $this->get('view_mode'))
+        ->accessCheck(FALSE)
         ->execute();
       if (count($candidate_template_ids) > 1) {
         $this->delete();

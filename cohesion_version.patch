@@ -1,0 +1,168 @@
+diff --git a/cohesion/cohesion.info.yml b/cohesion/cohesion.info.yml
+index 30d9f62..578f4e3 100755
+--- a/cohesion/cohesion.info.yml
++++ b/cohesion/cohesion.info.yml
+@@ -3,7 +3,7 @@ type: module
+ description: 'Defines the base Site Studio entities, import and administration controllers and drush commands.'
+ version: 8.x-6.9.5
+ package: Site Studio
+-core_version_requirement: ^8.8.0 || ^9
++core_version_requirement: ^8.8.0 || ^9 || ^10 || ^11
+ dependencies:
+   - contextual
+   - imce
+diff --git a/cohesion/modules/cohesion_base_styles/cohesion_base_styles.info.yml b/cohesion/modules/cohesion_base_styles/cohesion_base_styles.info.yml
+index 69c4c55..ae5d76e 100644
+--- a/cohesion/modules/cohesion_base_styles/cohesion_base_styles.info.yml
++++ b/cohesion/modules/cohesion_base_styles/cohesion_base_styles.info.yml
+@@ -1,7 +1,7 @@
+ name: Site Studio base styles
+ type: module
+ description: 'Defines the base style configuration entities for creating HTML element base styles.'
+-core_version_requirement: ^8.8.0 || ^9
++core_version_requirement: ^8.8.0 || ^9 || ^10 || ^11
+ package: Site Studio
+ dependencies:
+   - cohesion
+diff --git a/cohesion/modules/cohesion_breakpoint_indicator/cohesion_breakpoint_indicator.info.yml b/cohesion/modules/cohesion_breakpoint_indicator/cohesion_breakpoint_indicator.info.yml
+index 5963818..b66cf56 100644
+--- a/cohesion/modules/cohesion_breakpoint_indicator/cohesion_breakpoint_indicator.info.yml
++++ b/cohesion/modules/cohesion_breakpoint_indicator/cohesion_breakpoint_indicator.info.yml
+@@ -2,6 +2,6 @@ name: Site Studio breakpoint indicator
+ description: Adds a breakpoint indicator to Site Studio, which displays the current breakpoint you're viewing.
+ type: module
+ package: Site Studio
+-core_version_requirement: ^8.8.0 || ^9
++core_version_requirement: ^8.8.0 || ^9 || ^10 || ^11
+ dependencies:
+   - cohesion
+diff --git a/cohesion/modules/cohesion_custom_styles/cohesion_custom_styles.info.yml b/cohesion/modules/cohesion_custom_styles/cohesion_custom_styles.info.yml
+index ba83330..c11ec77 100644
+--- a/cohesion/modules/cohesion_custom_styles/cohesion_custom_styles.info.yml
++++ b/cohesion/modules/cohesion_custom_styles/cohesion_custom_styles.info.yml
+@@ -1,7 +1,7 @@
+ name: Site Studio custom styles
+ type: module
+ description: 'Defines the custom style configuration entities for creating custom CSS class styles.'
+-core_version_requirement: ^8.8.0 || ^9
++core_version_requirement: ^8.8.0 || ^9 || ^10 || ^11
+ package: Site Studio
+ dependencies:
+   - cohesion
+diff --git a/cohesion/modules/cohesion_elements/cohesion_elements.info.yml b/cohesion/modules/cohesion_elements/cohesion_elements.info.yml
+index b979f55..a603602 100644
+--- a/cohesion/modules/cohesion_elements/cohesion_elements.info.yml
++++ b/cohesion/modules/cohesion_elements/cohesion_elements.info.yml
+@@ -1,7 +1,7 @@
+ name: Site Studio elements
+ type: module
+ description: 'Defines the component and helper configuration entities for creating reusable layout configurations within Site Studio.'
+-core_version_requirement: ^8.8.0 || ^9
++core_version_requirement: ^8.8.0 || ^9 || ^10 || ^11
+ package: Site Studio
+ dependencies:
+   - cohesion
+diff --git a/cohesion/modules/cohesion_style_guide/cohesion_style_guide.info.yml b/cohesion/modules/cohesion_style_guide/cohesion_style_guide.info.yml
+index c27addd..bd70959 100644
+--- a/cohesion/modules/cohesion_style_guide/cohesion_style_guide.info.yml
++++ b/cohesion/modules/cohesion_style_guide/cohesion_style_guide.info.yml
+@@ -1,7 +1,7 @@
+ name: Site Studio style guide manager
+ type: module
+ description: 'Defines a set of configuration that can be applied per theme.'
+-core_version_requirement: ^8.8.0 || ^9
++core_version_requirement: ^8.8.0 || ^9 || ^10 || ^11
+ package: Site Studio
+ dependencies:
+   - cohesion
+diff --git a/cohesion/modules/cohesion_style_helpers/cohesion_style_helpers.info.yml b/cohesion/modules/cohesion_style_helpers/cohesion_style_helpers.info.yml
+index 8d4dd58..ff5ba73 100644
+--- a/cohesion/modules/cohesion_style_helpers/cohesion_style_helpers.info.yml
++++ b/cohesion/modules/cohesion_style_helpers/cohesion_style_helpers.info.yml
+@@ -1,7 +1,7 @@
+ name: Site Studio style helpers
+ type: module
+ description: 'Defines the style helper configuration entities for creating reusable style configurations in Site Studio.'
+-core_version_requirement: ^8.8.0 || ^9
++core_version_requirement: ^8.8.0 || ^9 || ^10 || ^11
+ package: Site Studio
+ dependencies:
+   - cohesion
+diff --git a/cohesion/modules/cohesion_sync/cohesion_sync.info.yml b/cohesion/modules/cohesion_sync/cohesion_sync.info.yml
+index 7f8bd8d..0149d82 100644
+--- a/cohesion/modules/cohesion_sync/cohesion_sync.info.yml
++++ b/cohesion/modules/cohesion_sync/cohesion_sync.info.yml
+@@ -1,7 +1,7 @@
+ name: Site Studio sync
+ type: module
+ description: 'Share packages of dependent configuartion between sites.'
+-core_version_requirement: ^8.8.0 || ^9
++core_version_requirement: ^8.8.0 || ^9 || ^10 || ^11
+ package: Site Studio
+ dependencies:
+   - cohesion
+diff --git a/cohesion/modules/cohesion_templates/cohesion_templates.info.yml b/cohesion/modules/cohesion_templates/cohesion_templates.info.yml
+index 9d939bf..c7fe960 100644
+--- a/cohesion/modules/cohesion_templates/cohesion_templates.info.yml
++++ b/cohesion/modules/cohesion_templates/cohesion_templates.info.yml
+@@ -1,7 +1,7 @@
+ name: Site Studio templates
+ type: module
+ description: 'Defines the template configuration entities for creating Site Studio templates.'
+-core_version_requirement: ^8.8.0 || ^9
++core_version_requirement: ^8.8.0 || ^9 || ^10 || ^11
+ package: Site Studio
+ dependencies:
+   - cohesion
+diff --git a/cohesion/modules/cohesion_website_settings/cohesion_website_settings.info.yml b/cohesion/modules/cohesion_website_settings/cohesion_website_settings.info.yml
+index fe049f5..9a7eea9 100644
+--- a/cohesion/modules/cohesion_website_settings/cohesion_website_settings.info.yml
++++ b/cohesion/modules/cohesion_website_settings/cohesion_website_settings.info.yml
+@@ -1,7 +1,7 @@
+ name: Site Studio website settings
+ type: module
+ description: 'Defines the website settings configuration entities.'
+-core_version_requirement: ^8.8.0 || ^9
++core_version_requirement: ^8.8.0 || ^9 || ^10 || ^11
+ package: Site Studio
+ libraries:
+   - core/jquery.ui
+diff --git a/cohesion/modules/example_custom_component/example_custom_component.info.yml b/cohesion/modules/example_custom_component/example_custom_component.info.yml
+index e5e3b10..a2277d3 100644
+--- a/cohesion/modules/example_custom_component/example_custom_component.info.yml
++++ b/cohesion/modules/example_custom_component/example_custom_component.info.yml
+@@ -1,7 +1,7 @@
+ name: Site Studio example custom component
+ type: module
+ description: 'A working example of a custom Site Studio component to show a developer how they can create one.'
+-core_version_requirement: ^8.8.0 || ^9
++core_version_requirement: ^8.8.0 || ^9 || ^10 || ^11
+ package: Site Studio
+ dependencies:
+   - cohesion
+diff --git a/cohesion/modules/example_element/example_element.info.yml b/cohesion/modules/example_element/example_element.info.yml
+index f5dacbe..528a881 100644
+--- a/cohesion/modules/example_element/example_element.info.yml
++++ b/cohesion/modules/example_element/example_element.info.yml
+@@ -1,7 +1,7 @@
+ name: Site Studio example custom element
+ type: module
+ description: 'A working example of a custom Site Studio element to show a developer how they can create one.'
+-core_version_requirement: ^8.8.0 || ^9
++core_version_requirement: ^8.8.0 || ^9 || ^10 || ^11
+ package: Site Studio
+ dependencies:
+   - cohesion
+diff --git a/cohesion/modules/sitestudio_page_builder/sitestudio_page_builder.info.yml b/cohesion/modules/sitestudio_page_builder/sitestudio_page_builder.info.yml
+index fcb33ca..cd57b5f 100644
+--- a/cohesion/modules/sitestudio_page_builder/sitestudio_page_builder.info.yml
++++ b/cohesion/modules/sitestudio_page_builder/sitestudio_page_builder.info.yml
+@@ -1,7 +1,7 @@
+ name: Site Studio Visual Page Builder
+ type: module
+ description: 'Allows users to create and edit Site Studio content using a visual drag and drop page builder.'
+-core_version_requirement: ^8.8.0 || ^9
++core_version_requirement: ^8.8.0 || ^9 || ^10 || ^11
+ package: Site Studio
+ dependencies:
+   - cohesion

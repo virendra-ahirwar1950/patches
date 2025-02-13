@@ -1,0 +1,82 @@
+name: Coherence
+type: profile
+description: 'Install with commonly used Cohesion features pre-configured.'
+version: VERSION
+core_version_requirement: ^8.8 || ^9
+install:
+  - node
+  - history
+  - block
+  - ckeditor
+  - config
+  - contextual
+  - menu_link_content
+  - datetime
+  - block_content
+  - quickedit
+  - editor
+  - help
+  - image
+  - menu_ui
+  - options
+  - path
+  - page_cache
+  - dynamic_page_cache
+  - taxonomy
+  - shortcut
+  - toolbar
+  - field_ui
+  - file
+  - rdf
+  - views
+  - views_ui
+  - automated_cron
+  - coherence_core
+  - cohesion
+  - cohesion_base_styles
+  - cohesion_custom_styles
+  - cohesion_website_settings
+  - cohesion_templates
+  - cohesion_elements
+  - cohesion_style_helpers
+  - cohesion_sync
+  - context_ui
+  - admin_toolbar
+  - admin_toolbar_tools
+  - admin_toolbar_links_access_filter
+  - request_data_conditions
+  - pathauto
+  - module_filter
+  - field_group
+  - redirect
+  - simple_sitemap
+  - menu_breadcrumb
+  - metatag_views
+  - metatag_facebook
+  - webform_node
+  - webform_ui
+  - seckit
+  - mailsystem
+  - smtp
+  - pathauto
+  - rh_node
+  - rh_taxonomy
+  - reroute_email
+  - honeypot
+  - username_enumeration_prevention
+  - eu_cookie_compliance
+  - linkit
+  - editor_advanced_link
+  - better_exposed_filters
+  - password_policy
+  - password_policy_length
+  - password_policy_character_types
+  - password_policy_username
+  - roleassign
+  - autologout
+  - userprotect
+  - entity_clone
+  - node_revision_delete
+themes:
+  - bartik
+  - seven

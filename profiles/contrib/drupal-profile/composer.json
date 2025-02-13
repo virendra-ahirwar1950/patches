@@ -1,0 +1,10 @@
+{
+  "name": "coherence/drupal-profile",
+  "description": "Coherence profile",
+  "type": "drupal-profile",
+  "minimum-stability": "dev",
+  "version": "2.2.0",
+  "require": {
+    "php": ">=7.4"
+  }
+}

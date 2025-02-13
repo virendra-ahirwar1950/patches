@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_layout
+    - node.type.page
+  module:
+    - cohesion_elements
+id: node.page.field_layout
+field_name: field_layout
+entity_type: node
+bundle: page
+label: Layout
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:cohesion_layout'
+  handler_settings: {  }
+field_type: cohesion_entity_reference_revisions

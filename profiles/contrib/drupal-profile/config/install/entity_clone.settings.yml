@@ -1,0 +1,57 @@
+form_settings:
+  cohesion_layout:
+    default_value: true
+    disable: true
+    hidden: true
+  node:
+    disable: true
+    hidden: true
+    default_value: false
+  taxonomy_term:
+    disable: true
+    hidden: true
+    default_value: false
+  user:
+    disable: true
+    hidden: true
+    default_value: false
+  paragraph:
+    default_value: true
+    disable: true
+    hidden: true
+  block_content:
+    default_value: false
+    disable: false
+    hidden: false
+  asset_subscription:
+    default_value: false
+    disable: false
+    hidden: false
+  component_content:
+    default_value: false
+    disable: false
+    hidden: false
+  file:
+    default_value: false
+    disable: false
+    hidden: false
+  redirect:
+    default_value: false
+    disable: false
+    hidden: false
+  search_api_task:
+    default_value: false
+    disable: false
+    hidden: false
+  shortcut:
+    default_value: false
+    disable: false
+    hidden: false
+  webform_submission:
+    default_value: false
+    disable: false
+    hidden: false
+  menu_link_content:
+    default_value: false
+    disable: false
+    hidden: false

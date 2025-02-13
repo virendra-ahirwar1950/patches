@@ -146,7 +146,7 @@ class CohesionViewsStylePlugin extends StylePluginBase {
    */
   public function render() {
     if ($this->usesRowPlugin() && empty($this->view->rowPlugin)) {
-      debug('Drupal\views\Plugin\views\style\StylePluginBase: Missing row plugin');
+      dump('Drupal\views\Plugin\views\style\StylePluginBase: Missing row plugin');
       return FALSE;
     }
 

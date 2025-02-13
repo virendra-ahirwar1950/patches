@@ -14,7 +14,8 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *
  * @ingroup entity_api
  */
-abstract class CohesionConfigEntityBase extends ConfigEntityBase implements CohesionSettingsInterface, EntityUpdateInterface {
+abstract class CohesionConfigEntityBase extends ConfigEntityBase implements CohesionSettingsInterface, EntityUpdateInterface
+{
 
   use EntityJsonValuesTrait;
 
@@ -86,25 +87,27 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
   /**
    * {@inheritdoc}
    */
-  public function getJsonValues() {
+  public function getJsonValues()
+  {
     return $this->json_values;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getJsonMapper() {
+  public function getJsonMapper()
+  {
     return $this->json_mapper;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getDecodedJsonMapper() {
+  public function getDecodedJsonMapper()
+  {
     try {
       return json_decode($this->getJsonMapper());
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       return [];
     }
   }
@@ -112,7 +115,8 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
   /**
    * {@inheritdoc}
    */
-  public function setJsonValue($json_values) {
+  public function setJsonValue($json_values)
+  {
     $this->set('json_values', $json_values);
     return $this;
   }
@@ -120,7 +124,8 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
   /**
    * {@inheritdoc}
    */
-  public function setJsonMapper($json_mapper) {
+  public function setJsonMapper($json_mapper)
+  {
     $this->set('json_mapper', trim($json_mapper));
     return $this;
   }
@@ -128,21 +133,24 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
   /**
    * {@inheritdoc}
    */
-  public function getConfigType() {
+  public function getConfigType()
+  {
     return $this->getEntityTypeId();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getConfigItemId() {
+  public function getConfigItemId()
+  {
     return crc32($this->getEntityTypeId() . '_' . $this->id());
   }
 
   /**
    * @return bool
    */
-  public function getStatus() {
+  public function getStatus()
+  {
     return $this->status;
   }
 
@@ -151,7 +159,8 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
    *
    * @return bool
    */
-  public function isModified() {
+  public function isModified()
+  {
     return $this->modified;
   }
 
@@ -162,7 +171,8 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
    *
    * @return $this
    */
-  public function setModified($modified = TRUE) {
+  public function setModified($modified = TRUE)
+  {
     $this->set('modified', (bool) $modified);
     return $this;
   }
@@ -172,7 +182,8 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
    *
    * @return bool
    */
-  public function isSelectable() {
+  public function isSelectable()
+  {
     return $this->selectable;
   }
 
@@ -183,7 +194,8 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
    *
    * @return $this
    */
-  public function setSelectable($selectable = TRUE) {
+  public function setSelectable($selectable = TRUE)
+  {
     $this->set('selectable', (bool) $selectable);
     return $this;
   }
@@ -191,14 +203,16 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
   /**
    * {@inheritdoc}
    */
-  public function isLocked() {
+  public function isLocked()
+  {
     return $this->locked;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setLocked($locked) {
+  public function setLocked($locked)
+  {
     $this->set('locked', $locked);
     return $this;
   }
@@ -208,14 +222,16 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
    *
    * @return string
    */
-  public static function getAssetGroupId() {
+  public static function getAssetGroupId()
+  {
     return get_called_class()::ASSET_GROUP_ID;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function preSave(EntityStorageInterface $storage) {
+  public function preSave(EntityStorageInterface $storage)
+  {
     \Drupal::service('cohesion.entity_update_manager')->apply($this);
 
     // If the entity type can't be enabled or disable force setting status to
@@ -242,7 +258,8 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
   /**
    * {@inheritdoc}
    */
-  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+  public function postSave(EntityStorageInterface $storage, $update = TRUE)
+  {
 
     // Update the requires table for this entity.
     \Drupal::service('cohesion_usage.update_manager')->buildRequires($this);
@@ -257,7 +274,8 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
   /**
    * {@inheritdoc}
    */
-  public static function preDelete(EntityStorageInterface $storage, array $entities) {
+  public static function preDelete(EntityStorageInterface $storage, array $entities)
+  {
     foreach ($entities as $entity) {
       if ($entity->isUninstalling() || $entity->isSyncing()) {
         // During extension uninstall and configuration synchronization
@@ -281,7 +299,8 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
   /**
    * {@inheritdoc}
    */
-  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+  public static function postDelete(EntityStorageInterface $storage, array $entities)
+  {
     parent::postDelete($storage, $entities);
     foreach ($entities as $entity) {
       $config_entities = \Drupal::service('config.manager')
@@ -304,7 +323,8 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
   /**
    * {@inheritdoc}
    */
-  public function setDefaultValues() {
+  public function setDefaultValues()
+  {
     // Set default entity values.
     $this->json_values = '{}';
     $this->json_mapper = '{}';
@@ -320,7 +340,8 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
    *
    * @return array
    */
-  public static function getAll($enabled = TRUE) {
+  public static function getAll($enabled = TRUE)
+  {
     $entities = [];
     $entity_defs = \Drupal::service('entity_type.manager')->getDefinitions();
     $config_entities = array_keys($entity_defs);
@@ -329,11 +350,15 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
       if (strpos($entity_id, 'cohesion_') !== FALSE) {
         if ($storage = \Drupal::service('entity_type.manager')->getStorage($entity_id)) {
           if ($enabled) {
-            $ids = $storage->getQuery()->condition('status', $enabled)->execute();
+            $query = $storage->getQuery()->condition('status', $enabled);
+          } else {
+            $query = $storage->getQuery();
           }
-          else {
-            $ids = $storage->getQuery()->execute();
-          }
+
+          // Explicitly call accessCheck() to handle access checks
+          $query->accessCheck(TRUE); // This will enable access checking.
+
+          $ids = $query->execute();
           $ids = array_keys($ids);
 
           if ($ids) {
@@ -348,14 +373,16 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
   /**
    * {@inheritdoc}
    */
-  public function getLastAppliedUpdate() {
+  public function getLastAppliedUpdate()
+  {
     return $this->last_entity_update;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setLastAppliedUpdate($callback) {
+  public function setLastAppliedUpdate($callback)
+  {
     $this->set('last_entity_update', $callback);
     return $this;
   }
@@ -363,7 +390,8 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
   /**
    * {@inheritdoc}
    */
-  public function hasInUse() {
+  public function hasInUse()
+  {
     // If this entity has an in-use route...
     if ($this->getEntityType()->hasLinkTemplate('in-use')) {
       // Check if it's in use on any entities.
@@ -375,7 +403,8 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
   /**
    * {@inheritdoc}
    */
-  public function getInUseMarkup() {
+  public function getInUseMarkup()
+  {
     if ($this->hasInUse()) {
       $markup = [
         '#type' => 'link',
@@ -392,8 +421,7 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
         ],
         '#attached' => ['library' => ['core/drupal.dialog.ajax']],
       ];
-    }
-    else {
+    } else {
       $markup = [
         '#markup' => t('Not in use'),
       ];
@@ -405,14 +433,16 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
   /**
    * {@inheritdoc}
    */
-  public function getInUseMessage() {
+  public function getInUseMessage()
+  {
     return [];
   }
 
   /**
    * @inheritdoc
    */
-  protected function urlRouteParameters($rel) {
+  protected function urlRouteParameters($rel)
+  {
     $uri_route_parameters = parent::urlRouteParameters($rel);
 
     // Add entity id as a parameter for the in use route.
@@ -426,14 +456,16 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
   /**
    * {@inheritdoc}
    */
-  public function reset() {
+  public function reset()
+  {
     $this->delete();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function createDuplicate() {
+  public function createDuplicate()
+  {
     $duplicate = parent::createDuplicate();
 
     $duplicate->setModified(FALSE);
@@ -444,7 +476,8 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
   /**
    * @param $entity
    */
-  protected static function clearCache($entity) {
+  protected static function clearCache($entity)
+  {
     // Clear the theme registry cache.
     \Drupal::service('theme.registry')->reset();
   }
@@ -452,31 +485,28 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
   /**
    * @return \Drupal\cohesion\ApiPluginBase|void
    */
-  public function process() {
-  }
+  public function process() {}
 
   /**
    * {@inheritdoc}
    */
-  public function clearData() {
-  }
+  public function clearData() {}
 
   /**
    * {@inheritdoc}
    */
-  public function isLayoutCanvas() {
-  }
+  public function isLayoutCanvas() {}
 
   /**
    * {@inheritdoc}
    */
-  public function jsonValuesErrors() {
-  }
+  public function jsonValuesErrors() {}
 
   /**
    * {@inheritdoc}
    */
-  public function getEntityMachineNamePrefix() {
+  public function getEntityMachineNamePrefix()
+  {
     // If the entity already exists and doesn't contain the prefix, don't use
     // the prefix.
     if ($this->id !== NULL && substr($this->id, 0, strlen($this::ENTITY_MACHINE_NAME_PREFIX)) !== $this::ENTITY_MACHINE_NAME_PREFIX) {
@@ -491,14 +521,16 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
   /**
    * {@inheritdoc}
    */
-  public function canEditMachineName() {
+  public function canEditMachineName()
+  {
     return $this->isNew();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function calculateDependencies() {
+  public function calculateDependencies()
+  {
     // All dependencies should be recalculated on every save apart from enforced
     // dependencies. This ensures stale dependencies are never saved.
     $this->dependencies = array_intersect_key($this->dependencies, ['enforced' => '']);
@@ -517,5 +549,4 @@ abstract class CohesionConfigEntityBase extends ConfigEntityBase implements Cohe
 
     return $this;
   }
-
 }

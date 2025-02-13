@@ -1,0 +1,11 @@
+abs_urls: false
+admin_theme: false
+roles_profiles:
+  administrator:
+    public: admin
+  content_editor:
+    public: admin
+  coherence_admin:
+    public: admin
+_core:
+  default_config_hash: 4FhrEwOM9yJ8neEoN77sxroTRBUXqRwap0KSJtFnYJs

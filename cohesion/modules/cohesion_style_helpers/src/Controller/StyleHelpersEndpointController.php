@@ -137,7 +137,7 @@ class StyleHelpersEndpointController extends ControllerBase {
    */
   private function styleHelperEntities() {
     try {
-      $ids = \Drupal::service('entity_type.manager')->getStorage('cohesion_style_helper')->getQuery()->condition('status', TRUE)->condition('selectable', TRUE)->execute();
+      $ids = \Drupal::service('entity_type.manager')->accessCheck(FALSE)->getStorage('cohesion_style_helper')->getQuery()->condition('status', TRUE)->condition('selectable', TRUE)->execute();
 
       return \Drupal::service('entity_type.manager')->getStorage('cohesion_style_helper')->loadMultiple($ids);
     }
@@ -188,7 +188,7 @@ class StyleHelpersEndpointController extends ControllerBase {
    */
   private function checkDuplicateByLabel($entity_type_id, $label) {
     try {
-      return \Drupal::entityQuery($entity_type_id)->condition('label', trim($label), '=')->count()->execute();
+      return \Drupal::entityQuery($entity_type_id)->accessCheck(FALSE)->condition('label', trim($label), '=')->count()->execute();
     }
     catch (PluginNotFoundException $ex) {
       watchdog_exception('cohesion', $ex);

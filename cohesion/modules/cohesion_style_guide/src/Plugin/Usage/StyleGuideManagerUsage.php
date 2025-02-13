@@ -122,6 +122,7 @@ class StyleGuideManagerUsage extends UsagePluginBase {
           ->getQuery()
           ->condition('theme', $base_theme_id)
           ->condition('style_guide_uuid', $entity->get('style_guide_uuid'))
+          ->accessCheck(FALSE)
           ->execute();
 
         $style_guide_managers_id = array_shift($style_guide_managers);

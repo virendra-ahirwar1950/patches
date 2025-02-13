@@ -107,6 +107,7 @@ function cohesion_style_guide_token_info() {
   $style_guide_ids = $style_guide_storage->getQuery()
     ->sort('weight')
     ->condition('status', TRUE)
+    ->accessCheck(FALSE)
     ->execute();
   $style_guides = $style_guide_storage->loadMultiple($style_guide_ids);
 

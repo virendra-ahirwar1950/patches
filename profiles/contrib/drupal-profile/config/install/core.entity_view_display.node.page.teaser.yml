@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.page.field_meta_tags
+    - node.type.page
+  module:
+    - user
+_core:
+  default_config_hash: piymGCjsh56sB19j_kr9Ns5Yg7b8jIMfjjioE8WM9XY
+id: node.page.teaser
+targetEntityType: node
+bundle: page
+mode: teaser
+content: {  }
+hidden:
+  field_meta_tags: true
+  links: true

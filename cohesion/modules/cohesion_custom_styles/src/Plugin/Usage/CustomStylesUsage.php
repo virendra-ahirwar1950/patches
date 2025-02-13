@@ -99,7 +99,7 @@ class CustomStylesUsage extends UsagePluginBase {
       $custom_style_classes = array_unique($custom_style_classes);
 
       // Add them to the dependencies.
-      $ids = $this->storage->getQuery('IN')
+      $ids = $this->storage->accessCheck(FALSE)->getQuery('IN')
         ->condition('class_name', $custom_style_classes)
         ->execute();
 

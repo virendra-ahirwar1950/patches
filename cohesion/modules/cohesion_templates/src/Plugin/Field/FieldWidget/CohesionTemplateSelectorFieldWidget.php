@@ -49,7 +49,7 @@ class CohesionTemplateSelectorFieldWidget extends WidgetBase {
     }
 
     // Get list of templates for this content type.
-    $template_ids = \Drupal::service('entity_type.manager')->getStorage('cohesion_content_templates')->getQuery()
+    $template_ids = \Drupal::service('entity_type.manager')->accessCheck(FALSE)->getStorage('cohesion_content_templates')->getQuery()
       ->condition('entity_type', $entity_type)
       ->condition('bundle', $bundle)
       ->condition('view_mode', 'full')
